@@ -1,0 +1,38 @@
+{% extends "store/base.html" %}
+{% load countries %}
+{% block title %}
+aajomos | Verify phone number
+{%endblock title %}
+{% block content %}
+<div class="container d-flexx justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="row">
+        <div class="col-md-5 offset-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="text-center mb-4">Verify Your Phone Number</h3>
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            {{ form.phone_number.label_tag }}
+                            {{ form.phone_number }}  <!-- Displays phone input with placeholder -->
+                            {% if form.phone_number.errors %}
+                                <div class="text-danger">
+                                    {{ form.phone_number.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+

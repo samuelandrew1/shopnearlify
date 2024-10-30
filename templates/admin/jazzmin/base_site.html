@@ -1,0 +1,10 @@
+{% extends "admin/base_site.html" %}
+
+{% block header %}
+    {{ block.super }} <!-- Keep the existing header content -->
+    <a href="{% url 'home' %}" class="navbar-brand" target="_blank" style="margin-left: 20px;">
+        <i class="fas fa-home"></i> Homepage
+    </a>
+{% endblock %}
+
+

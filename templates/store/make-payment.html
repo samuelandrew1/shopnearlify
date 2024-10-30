@@ -1,0 +1,119 @@
+{% extends 'store/base.html' %}
+{{ block.super }}
+
+{% block title %}
+ aajomos | checkout | {{ user }} | payment
+{% endblock title %}
+{% load humanize %}
+{% block content %}
+<div class="container row justify-content-center">
+    <div class="form-box col-12 col-md-8 col-lg-6">
+        <script src="https://js.paystack.co/v1/inline.js"></script>
+        <script>
+            $(document).ready(function() {
+                // Trigger SweetAlert when the page loads for payment confirmation
+                Swal.fire({
+                    title: `You are about to pay the sum of ₦ {{ payment.amount|intcomma }} for your order`,
+                    text: "You won't be able to revert this order",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, pay'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        payWithPaystack();
+                    } else {
+                        // Logic for canceling the order
+                        const orderId = "{{ order.id }}"; // Use the correct order ID here
+                        showFullPageLoader(); // Show full page loading indicator
+
+                        $.ajax({
+                            url: "{% url 'store:cancel_order' order.id %}", // URL to cancel order
+                            type: 'POST',
+                            data: {
+                                'order_id': orderId,
+                                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                            },
+                            success: function(response) {
+                                Swal.fire(
+                                    'Cancelled!',
+                                    'Your order has been cancelled.',
+                                    'success'
+                                ).then(() => {
+                                    window.location.href = "{% url 'store:cart' %}"; // Redirect to cart
+                                });
+                            },
+                            error: function(xhr, status, error) {
+                                Swal.fire(
+                                    'Error!',
+                                    'There was an issue cancelling your order.',
+                                    'error'
+                                );
+                            },
+                            complete: hideFullPageLoader // Hide loading indicator regardless of success or error
+                        });
+                    }
+                });
+
+                function payWithPaystack() {
+                    let currency = "NGN";
+                    let plan = "";
+                    let ref = "{{ payment.ref }}";
+                    let amount = "{{ payment.amount }}"; // Keep the raw amount for Paystack
+                    let obj = {
+                        key: "{{ paystack_pub_key }}",
+                        email: "{{ payment.email }}",
+                        amount: "{{ amount_value }}",
+                        ref: ref,
+                        callback: function(response) {
+                            showFullPageLoader(); // Show full page loading indicator
+                            window.location.href = "{% url 'paystack:verify_payment' payment.ref %}";
+                        },
+                    };
+                    if (Boolean(currency)) {
+                        obj.currency = currency.toUpperCase();
+                    }
+                    if (Boolean(plan)) {
+                        obj.plan = plan;
+                    }
+
+                    var handler = PaystackPop.setup(obj);
+                    handler.openIframe();
+                }
+
+                function showFullPageLoader() {
+                    // Show full page loading overlay
+                    var loader = document.getElementById('full-page-loader');
+                    if (loader) {
+                        loader.style.display = 'flex'; // Use flex to center the loader
+                    }
+
+                    // Disable all interactions with the page
+                    $('body').css('pointer-events', 'none');
+                }
+
+                function hideFullPageLoader() {
+                    // Hide full page loading overlay
+                    var loader = document.getElementById('full-page-loader');
+                    if (loader) {
+                        loader.style.display = 'none';
+                    }
+
+                    // Re-enable interactions with the page
+                    $('body').css('pointer-events', 'auto');
+                }
+
+            });
+        </script>
+
+        <!-- Full Page Loading Indicator -->
+        <div id="full-page-loader" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 1000; align-items: center; justify-content: center;">
+            <div class="spinner-border" role="status" style="width: 3rem; height: 3rem;">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <p style="margin-top: 10px; font-size: 1.2rem;">Processing your request...</p>
+        </div>
+    </div><!-- End .form-box -->
+</div><!-- End .container -->
+{% endblock content %}

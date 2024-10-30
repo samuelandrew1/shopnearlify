@@ -1,0 +1,408 @@
+{% extends "store/base.html" %}
+{%load static %}
+{% block content %}
+{% load humanize %}
+{% load star_rating %}   
+
+        <main class="main">
+        	<div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+        		<div class="container">
+        			<h1 class="page-title"> <small>search 
+                        {% block title %}
+                        {{category.title}}
+                        {% endblock title %}
+                    </small><span> {{category_count}} result</span></h1>
+        		</div><!-- End .container -->
+        	</div><!-- End .page-header -->
+            <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'store:index'%}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="">Shop</a></li>
+                        <li class="breadcrumb-item " aria-current="page"><a href="{% url 'store:categories-list'%}">categories</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{category.title}}</li>
+                    </ol>
+                </div><!-- End .container -->
+            </nav><!-- End .breadcrumb-nav -->
+            <div id="product-list">
+            </div>
+            
+            <div class="page-content">
+                <div class="container">
+                	<div class="row">
+                		<div class="col-lg-9">
+                		
+                            <div class="products mb-3">
+                                <div class="row justify-content-center">
+                                    {% for item in results %}                                     
+                                    <div class="col-6 col-md-4 col-lg-4">
+                                        <div class="product product-7 text-center">
+                                            <figure class="product-media">
+                                                <span class="product-label label-new">{{item.product.label}}</span>
+                                                <a href="{{item.get_absolute_url}}">
+                                                    <img src="{{item.img_1.url}}" alt="Product image" class="product-image">
+                                                </a>
+
+                                                <div class="product-action-vertical">
+                                                    <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
+                                                    <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
+                                                    <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
+                                                </div><!-- End .product-action-vertical -->
+
+                                                <div class="product-action">
+                                                    <a href="{% url 'store:add-to-cart'}}" class="btn-product btn-cart"><span>add to cart</span></a>
+                                                </div><!-- End .product-action -->
+                                            </figure><!-- End .product-media -->
+
+                                            <div class="product-body">
+                                                <div class="product-cat">
+                                                    <a href="#">{{item.title}}</a>
+                                                </div><!-- End .product-cat -->
+                                                <h3 class="product-title"><a href="{{item.get_absolute_url}}">{{item.product.title}}</a></h3><!-- End .product-title -->
+                                                <div class="product-price">
+                                                    {% if item.discount_price|floatformat:2|intcomma%}            
+                                                    <span class="new-price">&#8358;{{item.discount_price|floatformat:2|intcomma}}</span>
+                                                    <span class="old-price">&#8358;{{item..price|floatformat:2|intcomma}}</span>
+                                                    {% else %}
+                                                    <span class="new-price">&#8358;{{item.price|floatformat:2|intcomma}}</span>
+                                                    <span class="old-price">&#8358;{{item.discount_price|floatformat:2|intcomma}}</span>
+                                                    {% endif %}
+                                                </div><!-- End .product-price -->
+                                                <div class="ratings-container">
+                                                    <style>
+                                                        #star-ratings {
+                                                            font-size: 20px;
+                                                            color: gold;
+                                                        }
+                                                    </style>
+                                                    <div id="star-ratings">
+                                                        {{ item.average_rating|floatformat:1 }}
+                                                        {% star_rating item.average_rating %}
+                                                    </div>
+                                                    <span class="ratings-text">( {{item.count}} reviews)</span>
+                                                </div><!-- End .rating-container -->                                      
+                                            </div><!-- End .product-body -->
+                                        </div><!-- End .product -->
+                                    </div><!-- End .col-sm-6 col-lg-4 -->
+
+                                    {% endfor %}
+
+                             
+                                  
+                                </div><!-- End .row -->
+                            </div><!-- End .products -->
+
+                			<!-- <nav aria-label="Page navigation">
+							    <ul class="pagination justify-content-center">
+							        <li class="page-item disabled">
+							            <a class="page-link page-link-prev" href="#" aria-label="Previous" tabindex="-1" aria-disabled="true">
+							                <span aria-hidden="true"><i class="icon-long-arrow-left"></i></span>Prev
+							            </a>
+							        </li>
+							        <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+							        <li class="page-item"><a class="page-link" href="#">2</a></li>
+							        <li class="page-item"><a class="page-link" href="#">3</a></li>
+							        <li class="page-item-total">of 6</li>
+							        <li class="page-item">
+							            <a class="page-link page-link-next" href="#" aria-label="Next">
+							                Next <span aria-hidden="true"><i class="icon-long-arrow-right"></i></span>
+							            </a>
+							        </li>
+							    </ul>
+							</nav> -->
+                		</div><!-- End .col-lg-9 -->
+
+                		<aside class="col-lg-3 order-lg-first">
+                    <form method="GET" >
+
+                			<div class="sidebar sidebar-shop">
+                				<div class="widget widget-clean">
+                					<label>Filters:</label>
+                					<a href="{% url 'store:categories-list'%}" class="sidebar-filter-clear">Clean All</a>
+                				</div><!-- End .widget widget-clean -->
+
+        						<div class="widget widget-collapsible">
+    								<h3 class="widget-title">
+									    <a data-toggle="collapse" href="#widget-2" role="button" aria-expanded="true" aria-controls="widget-2">
+									        Size
+									    </a>
+									</h3><!-- End .widget-title -->
+
+									<div class="collapse show" id="widget-2">
+										<div class="widget-body">
+											<div class="filter-items">
+			
+												<div class="filter-item">
+                                                    <div class="w-50">
+
+                                                        <select id="size" name="size" class="form-control">
+                                                        
+                                                            <option value="">All</option>
+                                                         {% for size in sizes %}
+                                                                <option value="{{ size.id }}" {% if size_id == size.id|stringformat:"s" %}selected{% endif %}>{{ size.size }}</option>
+                                                         {% endfor %}
+                                                        </select>												
+                                                    </div>			
+												</div><!-- End .filter-item -->
+
+											</div><!-- End .filter-items -->
+										</div><!-- End .widget-body -->
+									</div><!-- End .collapse -->
+        						</div><!-- End .widget -->
+
+        			
+        						<div class="widget widget-collapsible">
+    								<h3 class="widget-title">
+									    <a data-toggle="collapse" href="#widget-5" role="button" aria-expanded="true" aria-controls="widget-5">
+									        Price
+									    </a>
+									</h3><!-- End .widget-title -->
+
+									<div class="collapse show" id="widget-5">
+										<div class="widget-body">
+                                            <div class="filter-price">
+                                                <div class="filter-price-text">
+                                                    <div class="w-50">
+
+                                                        <label for="max_price">Min Price:</label>
+                                                        <input type="number" id="min_price" name="min_price" value="{{ min_price|default:'' }}">
+                                                        <label for="max_price">Max Price:</label>
+                                                        <input type="number" id="max_price" name="max_price" value="{{ max_price|default:'' }}">
+                                                    </div>
+                                                </div><!-- End .filter-price-text -->
+
+                                                <div id="price-slider"></div><!-- End #price-slider -->
+                                            </div><!-- End .filter-price -->
+										</div><!-- End .widget-body -->
+									</div><!-- End .collapse -->
+                                    <button class="btn btn-secondary" type="submit">filter</button>
+        						</div><!-- End .widget -->
+                			</div><!-- End .sidebar sidebar-shop -->
+                        </form>
+                		</aside><!-- End .col-lg-3 -->
+                        
+                	</div><!-- End .row -->
+                </div><!-- End .container -->
+            </div><!-- End .page-content -->
+
+
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script>
+                $(document).ready(function() {
+                    $('#filter-form').on('submit', function(e) {
+                        e.preventDefault();
+                        var form = $(this);
+                        $.ajax({
+                            url: form.attr('action'),
+                            data: form.serialize(),
+                            success: function(data) {
+                                $('#product-list').html(data.html);
+                            }
+                        });
+                    });
+                });
+            </script>  
+        </main><!-- End .main -->
+
+
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+ 
+{% endblock content %}
+ 
+
+
+
+class UpdateCartQuantity(View):
+    def post(self, request, *args, **kwargs):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            id = int(self.request.POST.get('id'))
+            quantity = request.POST.get('quantity')
+            quantity1 = request.POST.get('quantity1')
+            
+            # Validate the quantity
+            try:
+                quantity = int(quantity) or int(quantity1)
+            except (ValueError, TypeError):
+                return JsonResponse({'message': 'Invalid quantity'}, status=400)
+            
+            size = request.POST.get('size')
+            
+            product = get_object_or_404(Product, pk=id)
+            
+            if request.user.is_authenticated:
+                cart = get_object_or_404(Cart, product=product, is_ordered=False, user=request.user)
+                
+                cart.quantity = quantity
+                cart.size = size if size else None  # Handle the case where size is not provided
+                
+                cart.save()
+            else:
+                session_cart = request.session.get('cart', {})
+                
+                if str(id) in session_cart:
+                    session_cart[str(id)]['quantity'] = quantity
+                    session_cart[str(id)]['size'] = size if size else None  # Handle the case where size is not provided
+                else:
+                    session_cart[str(id)] = {
+                        'quantity': quantity,
+                        'size': size if size else None
+                    }
+                
+                request.session['cart'] = session_cart
+
+            if product.discount_price:
+                total_price = product.discount_price * quantity
+            else:
+                total_price = product.price * quantity
+
+            messages = [{'message': 'Cart updated successfully', 'tags': 'success'}]
+
+            return JsonResponse({
+                'product': product.title,
+                'id': id,
+                'qty': quantity,
+                'size': size,  # Ensure to return size even if it's None
+                'total_price': total_price,
+                'messages': messages
+            })
+        
+        return JsonResponse({'message': 'error'}, status=400)
+
+
+
+
+        @csrf_exempt
+        @require_POST
+        def add_to_cart(request):
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                slug = request.POST.get('slug')
+                product = get_object_or_404(Product, slug=slug)
+                quantity = int(request.POST.get('quantity', 1))  # Default quantity to 1 if not provided
+        
+                if request.user.is_authenticated:
+                    cart_qs = Cart.objects.filter(user=request.user, product=product, is_ordered=False)
+        
+                    if cart_qs.exists():
+                        cart_item = cart_qs.first()
+                        cart_item.quantity += quantity  # Update the quantity
+                        cart_item.save()
+                        messages.success(request, f"{product.title} quantity updated in cart")
+                    else:
+                        cart_item = Cart.objects.create(
+                            user=request.user,
+                            product=product,
+                            quantity=quantity,
+                            is_ordered=False
+                        )
+                        messages.success(request, f"{product.title} is added to cart")
+        
+                    # Create or update the order
+                    order, created = Order.objects.get_or_create(
+                        user=request.user,
+                        is_ordered=False,
+                        defaults={
+                            'reference': f'order-{secrets.token_hex(8)}',
+                            'date': timezone.now()
+                        }
+                    )
+        
+                    if not order.product.filter(id=cart_item.id).exists():
+                        order.product.add(cart_item)
+                    order.save()
+        
+                    Wishlist.objects.filter(user=request.user, product=product).delete()
+        
+                    storage = get_messages(request)
+                    response_messages = [{'message': message.message, 'tags': message.tags} for message in storage]
+        
+                    cart_count = Cart.objects.filter(user=request.user, is_ordered=False).count()
+        
+                    return JsonResponse({'success': True, 'cart_count': cart_count, 'messages': response_messages})
+                else:
+                    session_cart_id = request.session.get('cart_id')
+                    if not session_cart_id:
+                        session_cart_id = str(uuid.uuid4())
+                        request.session['cart_id'] = session_cart_id
+                        request.session.modified = True
+                        logger.info(f"New session cart_id created: {session_cart_id}")
+                    
+                    cart_qs = Cart.objects.filter(cart_id=session_cart_id, product=product, is_ordered=False)
+                    if cart_qs.exists():
+                        cart_item = cart_qs.first()
+                        cart_item.quantity += quantity  # Update the quantity
+                    else:
+                        cart_item = Cart.objects.create(cart_id=session_cart_id, product=product, is_ordered=False, quantity=quantity)
+                    cart_item.save()
+                    messages.success(request, f"{product.title} is added to cart")
+        
+                    # Create or update the order
+                    order, created = Order.objects.get_or_create(
+                        cart_id=session_cart_id,
+                        is_ordered=False,
+                        defaults={
+                            'reference': f'order-{secrets.token_hex(8)}',
+                            'date': timezone.now()
+                        }
+                    )
+        
+                    if not order.product.filter(id=cart_item.id).exists():
+                        order.product.add(cart_item)
+                    order.save()
+        
+                    storage = get_messages(request)
+                    response_messages = [{'message': message.message, 'tags': message.tags} for message in storage]
+        
+                    cart_count = Cart.objects.filter(cart_id=session_cart_id, is_ordered=False).count()
+        
+                    return JsonResponse({'success': True, 'cart_count': cart_count, 'messages': response_messages})
+            return JsonResponse({'message': 'error processing your request'}, status=400)
+
+            
+
+
+
+                    
+        function addToCart() {
+            let productSlug = "{{ product.slug }}";
+            console.log('Add to cart triggered', { 'slug': productSlug });
+
+            $.ajax({
+                url: "{% url 'store:add-to-cart' %}",
+                method: 'POST',
+                data: {
+                    slug: productSlug,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                success: function(response) {
+                    console.log('Success response:', response);
+                    $('#cart-count').html(response.cart_count);
+                    
+                    // Display messages using SweetAlert
+                    if (response.messages) {
+                        response.messages.forEach(function(message) {
+                            Swal.fire({
+                                text: message.message,
+                                icon: message.tags.includes('success') ? 'success' : 'error',
+                                timer: 3000,
+                                showConfirmButton: false
+                            });
+                        });
+                    } else {
+                        console.log('No messages in response');
+                    }
+
+
+                    // Change button ID and text
+                    $('#cart-btn').attr('id', 'delete-btn').text('Delete Cart');
+                    $('#cart-btn1').attr('id', 'delete-btn1').text('Delete Cart');
+
+                    // Attach delete event
+                    $('#delete-btn').off('click').on('click', deleteFromCart);
+                    $('#delete-btn1').off('click').on('click', deleteFromCart);
+                },
+                error: function(response) {
+                    console.log('Error response:', response);
+                }
+            });
+        }

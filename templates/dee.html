@@ -1,0 +1,665 @@
+{% extends 'store/base.html' %}
+{% load humanize %}
+{% block content %}
+{% load static %}
+{% block content %}
+{% load star_rating %}   
+{% load custom_filters %}
+{% load humanize %}
+{{block.super}}
+<main>
+    <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
+        <div class="container d-flex align-items-center">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'store:index' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'store:categories-list' %}">Shop</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ product.title }}</li>
+            </ol>
+            {% block title %}
+            {{ product.title }}
+            {% endblock title %}
+            {% block seo %}
+            <meta name="description" content="{{ product.description.title }}">
+            <meta name="keywords" content="{{ product.title }}">
+            {% endblock seo %}
+        </div><!-- End .container -->
+    </nav><!-- End .breadcrumb-nav -->
+
+    <div class="page-content" data-product-id="{{ product.id }}">
+        <div class="container">
+            <div class="product-details-top">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="product-gallery product-gallery-separated">
+                            <span class="product-label label-sale">{{ product.label }}</span>
+                            <figure class="product-separated-itemx">
+                                <img src="{{ product.img_1.url }}" alt="product image">
+                                <a href="#" id="btn-separated-gallery" class="btn-product-gallery">
+                                    <i class="icon-arrows"></i>
+                                </a>
+                            </figure>
+
+                            {% if product.img_2 %}
+                            <figure class="product-separated-item">
+                                <img src="{{ product.img_2.url }}" alt="product image">
+                            </figure>
+                            {% endif %}
+
+                            {% if product.img_3 %}
+                            <figure class="product-separated-item">
+                                <img src="{{ product.img_3.url }}" alt="product image">
+                            </figure>
+                            {% endif %}
+
+                            {% if product.img_4 %}
+                            <figure class="product-separated-item">
+                                <img src="{{ product.img_4.url }}" alt="product image">
+                            </figure>
+                            {% endif %}
+                        </div><!-- End .product-gallery -->
+                    </div><!-- End .col-md-6 -->
+
+                    <div class="col-md-6">
+                        <div class="product-details sticky-content">
+                            <h1 class="product-title" id="product-title">{{ product.title }}</h1><!-- End .product-title -->
+
+                            <div class="ratings-container">
+                                <style>
+                                    #star-ratings {
+                                        font-size: 20px;
+                                        color: gold;
+                                    }
+                                </style>
+                                <div id="star-ratings">
+                                    <p id="average-rating">
+                                        {{ product.average_rating|floatformat:1 }}
+                                    </p>
+                                    {% star_rating product.average_rating %}
+                                </div>
+                                <span class="ratings-text">{{ item.count }} {{ count }} (reviews)</span>
+                            </div><!-- End .ratings-container -->
+
+                            <div class="product-price">
+                                {% if product.discount_price %}
+                                <span class="new-price" id="new-price">&#8358;{{ product.discount_price|floatformat:2|intcomma }}</span>
+                                <span class="old-price">&#8358;{{ product.price|floatformat:2|intcomma }}</span>
+                                {% else %}
+                                <span class="new-price">&#8358;{{ product.price|floatformat:2|intcomma }}</span>
+                                {% endif %}
+                            </div><!-- End .product-price -->
+
+                            <div class="product-content">
+                                <p id="product-description">{{ product.description }}</p>
+                            </div><!-- End .product-content -->
+
+                            <div class="product-details-action">           
+                                <button class="btn-product btn-cart btn" type="submit" id="cart-btn">
+                                <!--class=" btn btn-product btn-wishlist"  -->
+                                <span>Add to Cart</span></button>
+                                <div class="details-action-wrapper">
+                                    <!-- <button id="remove-from-wishlist" class="btn-product btn-wishlist  btn-link" data-url="{{ product.get_remove_from_wishlist_url }}" class="btn btn-danger">Remove from Wishlist</button> -->
+                                    <button class="toggle-wishlist btn-product btn-wishlist btn" 
+                                    data-add-url="{{ product.get_add_to_wishlist_url }}" 
+                                    data-remove-url="{{ product.get_remove_from_wishlist_url }}" 
+                                    data-product-id="{{ product.id }}" 
+                                    class="btn">
+                                {% if in_wishlist %}
+                                    Remove from Wishlist
+                                {% else %}
+                                    Add to Wishlist
+                                {% endif %}
+                            </button>  
+                                </div><!-- End .details-action-wrapper -->
+                            </div><!-- End .product-details-action -->
+                            <div >
+                                <label for="qty"> Minimum order: {{product.minimum_order}} pcs</label>
+                                    <div class="product" data-product-id="{{ product.id }}"></div>>
+                                        <label for="colors">Select Colors:</label><br>
+                                        <div class="product-colors">
+                                            {% for color in product.color.all %}
+                                            <div class="color-option" data-color-id="{{ color.id }}">
+                                                <label>{{ color.name }}</label>
+                                                <input type="number" id="quantity-input" data-color-name="{{ color.name }}" data-color-id="{{ color.id }}" value="0" min="0">
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="quantity">Quantity:</label>
+                                    </div>
+                                <label for="size">Size:</label>
+                                <div id="cart">
+                                    <input type="hidden" id="product-id" value="{{ product.id }}">
+                                    <div class="cart-item">
+                                        <h3>{{ product.title }}</h3>
+                                        {% for color in colors %}
+                                            <div class="color-quantity">
+                                                <label for="color-{{ color.name }}">Color: {{ color.name }}</label>
+                                                <input type="hidden" name="color" value="{{ color.name }}" class="color-input">
+                                                <label for="quantity-{{ color.name }}">Quantity:</label>
+                                                <input type="number" name="quantity" class="quantity-input" min="1" value="1" data-color="{{ color.name }}">
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>                            
+    </div>
+                            </div>
+                            <div class="details-filter-row details-row-size">
+                                <label for="qty"> total Qty: </label>
+                                <input type="hidden" id="product-id" value="{{ product.id }}" name="id">   
+                            </div>
+                            <div class="product-details-footer">
+                                <div class="product-cat">
+                                    <span>Category:</span>
+                                    <a href="#">{{ product.category.title }}</a>
+                                </div><!-- End .product-cat -->
+
+                                <div class="social-icons social-icons-sm">
+                                    <span class="social-label">Share:</span>
+                                    <a href="#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
+                                    <a href="#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
+                                    <a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
+                                    <a href="#" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
+                                </div><!-- End .social-icons -->
+                            </div><!-- End .product-details-footer -->
+
+                            <div class="accordion accordion-plus product-details-accordion" id="product-accordion">
+                                <div class="card card-box card-sm">
+                                    <div class="card-header" id="product-desc-heading">
+                                        <h2 class="card-title">
+                                            <a class="collapsed" role="button" data-toggle="collapse" href="#product-accordion-desc" aria-expanded="false" aria-controls="product-accordion-desc">
+                                                Description
+                                            </a>
+                                        </h2>
+                                    </div><!-- End .card-header -->
+                                    <div id="product-accordion-desc" class="collapse" aria-labelledby="product-desc-heading" data-parent="#product-accordion">
+                                        <div class="card-body">
+                                            <div class="product-desc-content">
+                                                <p>{{ product.description }}</p>
+                                            </div><!-- End .product-desc-content -->
+                                        </div><!-- End .card-body -->
+                                    </div><!-- End .collapse -->
+                                </div><!-- End .card -->
+
+                                <div class="card card-box card-sm">
+                                    <div class="card-header" id="product-info-heading">
+                                        <h2 class="card-title">
+                                            <a role="button" data-toggle="collapse" href="#product-accordion-info" aria-expanded="true" aria-controls="product-accordion-info">
+                                                Additional Information
+                                            </a>
+                                        </h2>
+                                    </div><!-- End .card-header -->
+                                    <div id="product-accordion-info" class="collapse show" aria-labelledby="product-info-heading" data-parent="#product-accordion">
+                                        <div class="card-body">
+                                            <div class="product-desc-content">
+                                                <p>{{ product.additional_information }}</p>
+
+                                                {% if product.features %}
+                                                <h3>Features</h3>
+                                                <ul>
+                                                    {% if product.features.feature1 %}
+                                                    <li>{{ product.features.feature1 }}</li>
+                                                    {% endif %}
+                                                    {% if product.features.feature2 %}
+                                                    <li>{{ product.features.feature2 }}</li>
+                                                    {% endif %}
+                                                    {% if product.features.feature3 %}
+                                                    <li>{{ product.features.feature3 }}</li>
+                                                    {% endif %}
+                                                    {% if product.features.feature4 %}
+                                                    <li>{{ product.features.feature4 }}</li>
+                                                    {% endif %}
+                                                    {% if product.features.feature5 %}
+                                                    <li>{{ product.features.feature5 }}</li>
+                                                    {% endif %}
+                                                </ul>
+                                                {% endif %}
+                                                {%for siz in product.size.all %}
+                                                <b>Size: {{ siz.size }}</b>
+                                                {%endfor%}
+                                            </div><!-- End .product-desc-content -->
+                                        </div><!-- End .card-body -->
+                                       
+                                            </div><!-- End .product-desc-content -->
+                                        </div><!-- End .card-body -->
+
+                                        
+                                            
+                                            
+                                            {% for rating in ratings %}               
+                                        <div class="card card-box card-sm">
+                                            <div class="card-header" id="product-review-heading">
+                                                <h2 class="card-title">
+                                                    <a class="collapsed" role="button" data-toggle="collapse" href="#product-accordion-review" aria-expanded="false" aria-controls="product-accordion-review">
+                                                        Reviews ({{count}})
+                                                    </a>
+                                                </h2>
+                                            </div><!-- End .card-header -->
+                                            <div id="product-accordion-review" class="collapse" aria-labelledby="product-review-heading" data-parent="#product-accordion">
+                                                <div class="card-body">
+                                                    <div class="reviews">
+                                                        <div class="review">
+                                                      
+                                                        <div class="review">
+                                                            <div class="row no-gutters">
+                                                                <div class="col-auto">
+                                                                    <h4><a href="#">{{rating.user.username}}</a></h4>
+                                                                    <div class="ratings-container">
+                                                                        <div id="star-ratings"  style="width: 100%;">
+                                                                            {% load star_rating %}
+                                                                            {% star_rating rating.rating %}
+                                                                        </div><!-- End .ratings -->
+                                                                    </div><!-- End .rating-container -->
+                                                                    <span class="review-date">{{rating.date}}</span>
+                                                                </div><!-- End .col -->
+                                                                <div class="col">
+                                                                    <h4>{{rating.headline}}</h4>
+
+                                                                    <div class="review-content">
+                                                                        <p>{{rating.review}}</p>
+                                                                    </div><!-- End .review-content -->
+
+                                                                    <div class="review-action">
+                                                                        <a href="#"><i class="icon-thumbs-up"></i>Helpful (0)</a>
+                                                                        <a href="#"><i class="icon-thumbs-down"></i>Unhelpful (0)</a>
+                                                                    </div><!-- End .review-action -->
+                                                                </div><!-- End .col-auto -->
+                                                            </div><!-- End .row -->
+                                                        </div><!-- End .review -->
+                                                        {% if user.is_authenticated and not user_rating %}
+                                                            <form method="post">
+                                                                {% csrf_token %}
+                                                                {{ rating_form.as_p }}
+                                                                <button type="submit" class="btn btn-primary">Submit Rating</button>
+                                                            </form>
+                                                        {% endif %}
+                                                    </div><!-- End .reviews -->
+                                                </div><!-- End .card-body -->
+                                            </div><!-- End .collapse -->
+                                        </div><!-- End .card -->
+                                        {% endfor %}
+
+
+                                    </div><!-- End .collapse -->
+                                </div><!-- End .card -->
+                            </div><!-- End .accordion -->
+                            
+                            <div class="sticky-bar">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <figure class="product-media">
+                                                <a href="product.html">
+                                                    <img src="{{product.img_1.url}}" alt="Product image">
+                                                </a>
+                                            </figure><!-- End .product-media -->
+                                            <h4 class="product-title"><a href="product.html">{{product.description}}</a></h4><!-- End .product-title -->
+                                        </div><!-- End .col-6 -->
+                        
+                                        <div class="col-6 justify-content-end">
+                                            <div class="product-price">
+                                                {% if product.discount_price|floatformat:2|intcomma%}            
+                                                <span class="new-price" id="new-price1">&#8358;{{product.discount_price|floatformat:2|intcomma}}</span>
+                                                <span class="old-price">&#8358;{{product.price|floatformat:2|intcomma}}</span>
+                                                {% else %}
+                                                <span class="new-price" id="new-price1">&#8358;{{product.price|floatformat:2|intcomma}}</span>
+                                                <span class="old-price">&#8358;{{product.discount_price|floatformat:2|intcomma}}</span>
+                                                {% endif %}
+                                            </div><!-- End .product-price -->
+                                            <div class="product-details-quantity">
+                                                <input type="number"  id="cart-quantity-input1" class="form-control" data-item-id="{{ product.id }}" value="{{ product.quantity }}" min="1" max="10" step="1" data-decimals="0" required="" name="quantity" value="{{ product.quantity }}" style="display: none;"><div class="input-group  input-spinner"><div class="input-group-prepend"><button style="min-width: 26px" class="btn btn-decrement btn-spinner" type="button"><i class="icon-minus"></i></button></div><input type="text" style="text-align: center" class="form-control " required="" placeholder=""><div class="input-group-append"><button style="min-width: 26px" class="btn btn-increment btn-spinner" type="button"><i class="icon-plus"></i></button></div></div>
+                                                <!-- <input type="number" id="cart-quantity-input1" class="form-control" data-item-id="{{ product.id }}" value="{{ product.quantity }}" name="quantity" min="1" step="1" data-decimals="0" required> -->
+                                            </div>              
+                                            <div class="product-details-action">                                 
+                                        <button class="btn-product btn-cart" id="cart-btn1"><span>add to cart</span></button>
+                                            <button class="toggle-wishlist btn-product btn-wishlist btn" 
+                                                data-add-url="{{ product.get_add_to_wishlist_url }}" 
+                                                data-remove-url="{{ product.get_remove_from_wishlist_url }}" 
+                                                data-product-id="{{ product.id }}" 
+                                                >
+                                            {% if in_wishlist %}
+                                                Remove from Wishlist
+                                            {% else %}
+                                                Add to Wishlist
+                                            {% endif %}
+                                        </button>
+                                        
+                                                <!-- <button id="add-to-wishlist" class="btn-product btn-wishlist"data-url="{{ product.get_add_to_wishlist_url }}" class="btn btn-primary">Add to Wishlist</button> -->
+                                                
+                                                <!-- <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a> -->
+                                            </div><!-- End .product-details-action -->
+                                        </div><!-- End .col-6 -->
+                                    </div><!-- End .row -->
+                                </div><!-- End .container -->
+                            </div>
+                        </div><!-- End .product-details -->
+                    </div><!-- End .col-md-6 -->
+                </div><!-- End .row -->
+            </div><!-- End .product-details-top -->
+        </div><!-- End .container -->
+    </div><!-- End .page-content -->
+</main><!-- End .main -->
+
+
+<main class="main">
+        	<div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+        		<div class="container">
+					<a href="{% url 'store:categories-list' %}">
+						<h1 class="page-title">Wishlist<span>Shop</span></h1>
+
+					</a>
+        		</div><!-- End .container -->
+        	</div><!-- End .page-header -->
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Shop</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Wishlist</li>
+                    </ol>
+                </div><!-- End .container -->
+            </nav><!-- End .breadcrumb-nav -->
+
+            <div class="page-content">
+            	<div class="container">
+					<table class="table table-wishlist table-mobile">
+						<thead>
+							<tr>
+								<th>Product</th>
+								<th>Price</th>
+								<th>Stock Status</th>
+								<th></th>
+								<th></th>
+							</tr>
+						</thead>
+
+						<tbody>
+                            
+                            
+							{% if wishlist %}						                   
+                            {% for items in wishlist %}            
+							<tr>
+								<td class="product-col">
+									<div class="product">
+										<figure class="product-media">
+											<a href="{{items.product.get_absolute_url}}">
+												<img src="{{items.product.img_1.url}}" alt="Product image">
+											</a>
+										</figure>
+
+										<h3 class="product-title">
+											<a href="#">{{items.product.title}}</a>
+										</h3><!-- End .product-title -->
+									</div><!-- End .product -->
+								</td>
+								<td class="price-col">
+									<div class="product-price">
+										{% if product.discount_price|floatformat:2|intcomma%}
+										<span class="new-price">&#8358;{{items.product.discount_price|floatformat:2|intcomma}}</span>
+										<span class="old-price">&#8358;{{items.product.price|floatformat:2|intcomma}}</span>
+										{% else %}
+										<span class="new-price">&#8358;{{items.product.price|floatformat:2|intcomma}}</span>
+										<span class="old-price">&#8358;{{items.product.discount_price|floatformat:2|intcomma}}</span>
+										{% endif %}
+									</div><!-- End .product-price -->
+								</td>
+								{% if items.stock_quantity > 0 %}
+								<td class="stock-col"><span class="in-stock">in stock: {{ items.stock_quantity }}</span></td>
+								<td>
+									<button class="btn btn-block btn-outline-primary-2 out-of-stock"><i class="icon-cart-plus"></i>Add to Cart</button>
+
+								</td>
+								{% else %}
+								<td><span class="out-of-stock">Out of stock</span></td>
+								<td class="action-col">
+									<button class="btn btn-block btn-outline-primary-2 disabled">Out of Stock</button>
+									
+								</td>
+
+								{% endif %}
+
+								<!-- <td class="action-col">
+                                    <div class="dropdown">
+									<button class="btn btn-block btn-outline-primary-2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="icon-list-alt"></i>Select Options
+                                    </button>
+
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#">First option</a>
+                                        <a class="dropdown-item" href="#">Another option</a>
+                                        <a class="dropdown-item" href="#">The best option</a>
+                                      </div>
+                                    </div>
+								</td> -->
+								<td class="remove-col"><button class="btn-remove"><i class="icon-close"></i></button></td>
+							</tr>
+                            {% endfor %}
+							{% else %}
+   					 <p>Your wishlist is empty.</p>
+                            {% endif %}
+						
+                        </tbody>
+					</table><!-- End .table table-wishlist -->
+	            	<div class="wishlist-share">
+	            		<div class="social-icons social-icons-sm mb-2">
+	            			<label class="social-label">Share on:</label>
+	    					<a href="#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
+	    					<a href="#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
+	    					<a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
+	    					<a href="#" class="social-icon" title="Youtube" target="_blank"><i class="icon-youtube"></i></a>
+	    					<a href="#" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
+	    				</div><!-- End .soial-icons -->
+	            	</div><!-- End .wishlist-share -->
+            	</div><!-- End .container -->
+            </div><!-- End .page-content -->
+
+			<script>
+				$(document).ready(function() {
+					function debounce(func, wait) {
+						let timeout;
+						return function(...args) {
+							const later = () => {
+								clearTimeout(timeout);
+								func.apply(this, args);
+							};
+							clearTimeout(timeout);
+							timeout = setTimeout(later, wait);
+						};
+					}
+		
+					function addToCart() {
+						let productSlug = "{{ product.slug }}";
+						console.log('Add to cart triggered', { 'slug': productSlug });
+			
+						$.ajax({
+							url: "{% url 'store:add-to-cart' %}",
+							method: 'POST',
+							data: {
+								slug: productSlug,
+								csrfmiddlewaretoken: "{{ csrf_token }}"
+							},
+							success: function(response) {
+								console.log('Success response:', response);
+								$('#cart-count').html(response.cart_count);
+								
+								// Display messages using SweetAlert
+								if (response.messages) {
+									response.messages.forEach(function(message) {
+										Swal.fire({
+											text: message.message,
+											icon: message.tags.includes('success') ? 'success' : 'error',
+											timer: 3000,
+											showConfirmButton: false
+										});
+									});
+								} else {
+									console.log('No messages in response');
+								}
+			
+			
+								// Change button ID and text
+								$('#cart-btn').attr('id', 'delete-btn').text('Delete from Cart');
+								$('#cart-btn1').attr('id', 'delete-btn1').text('Delete from Cart');
+			
+								// Attach delete event
+								$('#delete-btn').off('click').on('click', deleteFromCart);
+								$('#delete-btn1').off('click').on('click', deleteFromCart);
+							},
+							error: function(response) {
+								console.log('Error response:', response);
+							}
+						});
+					}
+			
+					function deleteFromCart() {
+						let productSlug = "{{ product.slug }}";
+						console.log('Delete from cart triggered', { 'slug': productSlug });
+			
+						$.ajax({
+							url: "{% url 'store:delete-from-cart' %}",
+							method: 'POST',
+							data: {
+								slug: productSlug,
+								csrfmiddlewaretoken: "{{ csrf_token }}"
+							},
+							success: function(response) {
+								console.log('Success response:', response);
+								$('#cart-count').html(response.cart_count);
+			
+								// Change button ID and text back to add to cart
+								$('#delete-btn').attr('id', 'cart-btn').text('Add to Cart');
+								$('#delete-btn1').attr('id', 'cart-btn1').text('Add to Cart');
+			
+								// Display messages using SweetAlert
+								// Display messages using SweetAlert
+								if (response.messages) {
+									response.messages.forEach(function(message) {
+										Swal.fire({
+											text: message.message,
+											icon: message.tags.includes('success') ? 'success' : 'error',
+											timer: 3000,
+											showConfirmButton: false
+										});
+									});
+								} else {
+									console.log('No messages in response');
+								}
+			
+								// Attach add event
+								$('#cart-btn').off('click').on('click', addToCart);
+								$('#cart-btn1').off('click').on('click', addToCart);
+							},
+							error: function(response) {
+								console.log('Error response:', response);
+							}
+						});
+					}
+			
+					// Attach initial add to cart event
+					$('#cart-btn').off('click').on('click', addToCart);
+					$('#cart-btn1').off('click').on('click', addToCart);   
+				});
+			
+				
+				function getCookie(name) {
+					let cookieValue = null;
+					if (document.cookie && document.cookie !== '') {
+						const cookies = document.cookie.split(';');
+						for (let i = 0; i < cookies.length; i++) {
+							const cookie = cookies[i].trim();
+							if (cookie.substring(0, name.length + 1) === (name + '=')) {
+								cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+								break;
+							}
+						}
+					}
+					return cookieValue;
+				}
+			
+		
+			</script>
+			  
+        </main><!-- End .main -->
+{% endblock content %}
+
+
+
+
+
+
+@csrf_exempt
+@require_POST
+def add_to_cart(request):
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        slug = request.POST.get('slug')
+        product = get_object_or_404(Product, slug=slug)
+        quantity = int(request.POST.get('quantity', 1))  # Default quantity to 1 if not provided
+
+        if request.user.is_authenticated:
+            cart_qs = Cart.objects.filter(user=request.user, product=product, is_ordered=False)
+
+            if cart_qs.exists():
+                cart_item = cart_qs.first()
+                # cart_item.quantity += quantity  # Increment the quantity
+                # cart_item.save()
+                messages.error(request, f"{product.title} is already added to cart")
+            else:
+                cart_item = Cart.objects.get_or_create(
+                    user=request.user,
+                    product=product,
+                    quantity=quantity,
+                    is_ordered=False
+                )
+                messages.success(request, f"{product.title} is added to cart")
+
+            # Create or update the order
+            order_qs = Order.objects.filter(user=request.user, is_ordered=False)
+            if order_qs.exists():
+                order = order_qs.first()
+            else:
+                order = Order.objects.get_or_create(
+                    user=request.user,
+                    reference=f'order-{secrets.token_hex(8)}',
+                    date=timezone.now(),
+                    is_ordered=False
+                )
+
+            if not order.product.filter(id=cart_item.id).exists():
+                order.product.add(cart_item)
+            order.save()
+                  
+            if request.user.is_authenticated:
+                Wishlist.objects.filter(user=request.user, product=product).delete()
+            else:
+                session_key = get_session_key(request)
+                Wishlist.objects.filter(session_key=session_key, product=product).delete()
+            
+
+            storage = get_messages(request)
+            response_messages = [{'message': message.message, 'tags': message.tags} for message in storage]
+
+            return JsonResponse({'success': True, 'cart_count': Cart.objects.filter(user=request.user, is_ordered=False).count(), 'messages': response_messages})
+        else:
+            # Handle cart for anonymous users
+            cart = request.session.get('cart', {})
+
+            if str(product.id) in cart:
+                # cart[str(product.id)]['quantity'] += quantity
+                messages.error(request, f"{product.title} is already in the cart cart")
+            else:
+                cart[str(product.id)] = {
+                    'product_id': product.id,
+                    'title': product.title,
+                    'quantity': quantity
+                }
+                messages.success(request, f"{product.title} is added to cart")
+
+            request.session['cart'] = cart
+            request.session.modified = True  # Ensure session is saved
+
+            storage = get_messages(request)
+            response_messages = [{'message': message.message, 'tags': message.tags} for message in storage]
+
+            return JsonResponse({'success': True, 'cart': request.session.get('cart', {}), 'messages': response_messages})
+
+    return JsonResponse({'message': 'error processing your request'}, status=400)

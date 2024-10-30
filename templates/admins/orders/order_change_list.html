@@ -1,0 +1,423 @@
+{% extends 'admins/base.html' %}
+{% load humanize %}
+{% load custom_filters %}
+{% load i18n %}
+{% load static %}
+{% block content %}  
+{% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+      <div class="alert {{ message.tags }}">
+        {{ message }}
+        <button type="button" class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<style>
+  .alert {
+    position: relative;
+    padding: 15px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  .close-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+  }
+</style>
+
+<div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+ 
+        
+          <h1>
+            {% if search_value %}
+            Search result for {{search_value}}
+    
+            {% elif not end_date  == start_date %} 
+            <p style="color:green; background-color:white; padding: 10px;" > order(s) as at   <span class='bg-danger m-5'> {{start_date|naturaltime}}</span> to 
+                <span class='bg-danger m-5'>{{end_date|naturalday}} </span>
+             </p>
+            {% else %}
+            <h1>Today's Orders <h1>
+            {% endif %}
+            {% if count %}
+            <small>{{count}} orders found </small>
+            {% else %}
+            <small> you have no active order(s) yet! </small>
+            {% endif %}
+          </h1>
+
+
+          <div class="d-flex p-2">
+            <form class="form-inline" method="POST" action="{% url 'admin:view_filtered_orders' %}">
+            {% csrf_token %}
+                <label for="start_date" class="box-title">Start Date:</label>
+                <input type="text" class="flatpickr" name="start_date" id="start_date" placeholder="Select Start Date">
+                
+                <label for="end_date" class="box-title">End Date:</label>
+                <input type="text" class="flatpickr" name="end_date" id="end_date" placeholder="Select End Date">
+                
+                <button type="submit" class="btn btn-primary">Filter</button>
+            
+            </form>
+
+
+            <form  class="sidebar-form" method="POST" action="{% url 'store:view_filter_orders' %}">
+                {% csrf_token %}
+            
+                <div class="input-group">
+                  <input type="text" name="search" class="form-control" placeholder="Search...orders">
+                  <span class="input-group-btn">
+                        <button type="submit"  id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                        </button>
+                      </span>
+                </div>
+              </form>
+
+
+        </div>
+
+          <ol class="breadcrumb">
+            <li><a href="{% url 'admin:index' %}"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Dashboard</li>
+          </ol>
+        </section>
+  
+        <!-- Main content -->
+        <section class="content">
+          <!-- Small boxes (Stat box) -->
+          <div class="row">
+
+            <div class="col-lg-3 col-xs-6">
+
+                <!-- small box -->
+                <div class="small-box bg-green">
+                  <div class="inner">
+                    {% if  not total_revenue  %}
+                    <p>&#8358; 0</p>
+                    <p>Total Revenue</p>
+
+                    {% else %}
+                    <h3>&#8358; {{total_revenue|floatformat|intcomma}}<sup style="font-size: 20px"></sup></h3>  
+                    <p>Total Revenue</p>
+                    {% endif %}
+                  </div>
+                  <div class="icon">
+                    <i class="ion ion-stats-barsx"></i>
+                  </div>
+                  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+              </div>
+
+            <div class="col-lg-3 col-xs-6">
+                <!-- small box -->
+                <div class="small-box bg-green">
+                  <div class="inner">
+                    <h3>{{delivered_orders}}<sup style="font-size: 20px"></sup></h3>  
+                    <p>Delivered orders</p>
+                  </div>
+                  <div class="icon">
+                    <i class="ion ion-stats-barsx"></i>
+                  </div>
+                  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+              </div>
+  
+
+            <div class="col-lg-3 col-xs-6">
+              <!-- small box -->
+              <div class="small-box bg-aqua">
+                <div class="inner">
+                    {% comment %} disaplay the total amount of orders {% endcomment %}
+                  <h3>{{total_orders|floatformat}}</h3>
+                  <p>Total verified Orders</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-bag"></i>
+                </div>
+                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+
+            <div class="col-lg-3 col-xs-6">
+                <!-- small box -->
+                <div class="small-box bg-yellow">
+                  <div class="inner">
+                    <h3>{{undelivered_orders}}</h3>
+                    <p>undelivered orders</p>
+                  </div>
+                  <div class="icon">
+                    <i class="ion ion-person-addx"></i>
+                  </div>
+                  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+
+
+
+            <!-- ./col -->
+            <div class="col-lg-3 col-xs-6">
+                <!-- small box -->
+                <div class="small-box bg-red">
+                  <div class="inner">
+                    <h3>{{user_cancelled}}</h3>
+      
+                    <p>User cancelled orders</p>
+                  </div>
+                  <div class="icon">
+                    <i class="ion ion-pie-graphx"></i>
+                  </div>
+                  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+              </div>
+          </div>
+          <!-- /.row -->
+
+          
+       <!-- Main row -->
+       <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header">
+                <h5 class="box-title" id="total-orders">orders</h5>
+        </div>
+  
+        <div class="box-body table-responsive no-padding"> 
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>Ref No.</th>
+                        <th>Status</th>
+                        <th>Delivery</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+            
+            <tbody>
+          {% comment %} {% for order in cl.result_list %} {% endcomment %}
+          {% for order in page_obj.object_list %}
+              <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.user }}</td>
+                <td>{{ order.date }}</td>
+  
+                <!-- Loop through products related to the order -->
+                <td>
+                  {% for item in order.product.all %}
+                    {{ item.product.title }}<br>
+                  {% endfor %}
+                </td>
+  
+                <td>{{ order.reference }}</td>
+  
+                <!-- Payment status -->
+                <td>
+                  {% if order.is_ordered %}
+                  <span class="label label-success">Payment verified</span>
+                  {% else %}
+                  <span class="label label-warning">Not verified</span>
+                  {% endif %}
+                </td>
+
+                <!-- Delivery status -->
+                <td>
+                  {% if not order.is_delivered and order.is_received %}
+                  <span class="label label-success">Delivered</span>
+  
+                  {% elif order.is_ordered and order.is_delivered %}
+                  <span class="label label-warning">Awaiting approval</span>
+  
+  
+                  {% elif order.is_received and order.is_delivered %}
+                  <span class="label label-success">Delivered</span>
+  
+                  {% elif order.is_ordered and not order.is_delivered %}
+                  <span class="label label-warning">Not delivered</span>
+  
+                  {% elif order.is_refund_request %}
+                  <span class="label label-danger">Refund requested</span>
+                  {% else %}
+                  <span class="label label-danger">Not yet ordered</span>
+                  {% endif %}
+                </td>
+  
+                <!-- Actions -->
+                <td>
+                  {% if order.is_ordered %}
+                    <a href="{% url 'admin:view_invoice' order.id %}" target="_blank"><button class="btn-view-invoice">View Invoice</button></a>
+                    <form action="{% url 'store:send_invoice_to_mail' %}">
+                      <input type='hidden' name='order_id'>
+                      <button class="btn-approve-order" type="submit" name="send_invoice">Send Invoice</button>
+                    </form>     
+                      <a href="{% url 'admin:cancel_order' order.id  %}"><button type="submit" name="send_invoice"  class="btn-danger">cancel</button></a>
+                        
+                    <a href="{% url 'admin:download_invoice' order.id %}"><button class="btn-approve-order">Download Invoice</button></a>            
+                    <a href="{% url 'admin:approve_order' order.id %}"><button class="btn-success">Approve Order</button></a>
+                  {% else %}
+                    <p>Not available</p>
+                  {% endif %}
+                </td>
+              </tr>
+
+              {% endfor %}
+            </tbody>
+          </table>
+          {% block pagination %}
+    
+          <ul class="pagination pagination-sm no-margin pull-right">   
+            {% if page_obj.has_previous %}
+                <li><a href="?page=1">&laquo; first</a></li>
+                <li><a href="?page={{ page_obj.previous_page_number }}">previous</a></li>
+            {% endif %}
+        
+            <li>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</li>
+            {% if page_obj.has_next %}
+                <li><a href="?page={{ page_obj.next_page_number }}">next</a></li>
+                <li><a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a></li>
+            {% endif %}
+        </ul>
+        
+{% endblock %}
+        </div>
+      </div>
+    </div>
+       <div class="row">
+
+         {% comment %} bar chart {% endcomment %}
+         <section class="col-lg-7 connectedSortable">
+            <!-- Custom tabs (Charts with tabs)-->
+            <div class="nav-tabs-custom">
+              <h3 class="box-title">
+                  order's bar chart
+                </h3>
+         
+            <canvas id="barChart"></canvas>    
+  
+              <div class="tab-content no-padding">
+   
+              </div>
+            </div>
+            <!-- /.nav-tabs-custom -->
+  
+     
+          </section>
+  
+
+    {% comment %} pie chart {% endcomment %}
+    <section class="col-lg-5 connectedSortable">
+
+        <div class="box box-solid bg-light-blue-gradient">
+          <div class="box-headerx">
+            <!-- tools box -->
+ 
+            </div>
+            <h3 class="box-title">
+              order's pie chart
+            </h3>
+          </div>
+          <canvas id="pieChart"></canvas>
+        </div>
+      </section>
+      <!-- right col -->
+      <!-- /.nav-tabs-custom -->
+<div class="row">
+
+   
+      </div>
+      <!-- /.row (main row) -->
+       
+
+        </section>
+      </div>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+      
+    <script>
+        // Get the labels and values from Django context
+        const labels = {{ chart_labels|safe }};
+        const values = {{ chart_values|safe }};
+        console.log("Labels:", labels);
+        console.log("Values:", values);
+        // Pie Chart with percentage
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        const pieChart = new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Orders',
+                    data: values,
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    datalabels: {
+                        formatter: (value, pieChart) => {
+                            // Calculate percentage
+                            const total = pieChart.dataset.data.reduce((acc, val) => acc + val, 0);
+                            const percentage = ((value / total) * 100).toFixed(2);
+                            return percentage + '%';  // Return percentage
+                        },
+                        color: '#fff',  // Label color
+                        font: {
+                            weight: 'bold',
+                            size: 14
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]  // Activate the datalabels plugin
+        });
+
+        // Bar Chart
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        const barChart = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Orders',
+                    data: values,
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                    borderColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+                   // Initialize flatpickr with date format `dd-mm-yy`
+                   flatpickr(".flatpickr", {
+                    dateFormat: "d-m-Y",  // Set format to `dd-mm-yy`
+                });
+              
+
+    </script>    
+    
+      {{ block.super }}
+
+
+      {% endblock content %}

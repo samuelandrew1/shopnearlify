@@ -1,0 +1,411 @@
+{% extends 'store/base.html' %}
+{% block title %}
+   <title> aajomos |{{user}} | cart</title>
+{% endblock title %}
+    
+{% load humanize %}
+{% load cart_template_tag %}
+{% block content %}
+{% load custom_filters %}
+
+<main>
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'store:index' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'store:categories-list' %}">Shop</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ user }}-cart</li>
+            </ol>
+        </div>
+    </nav>
+    {% if cart_items %}
+
+    <div class="page-content">
+        <div class="cart">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-9">
+                        <table class="table table-cart table-mobile">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <!-- <tbody>
+                                {% for item in cart_items %}
+                                <tr   data-cart-item-id="{{ item.id }}">
+                                    <td class="product-col">
+                                        <div class="product">
+                                            <figure class="product-media">
+                                                <a href="{{ item.product.get_absolute_url }}">
+                                                    
+                                                    {% if item.color.img.url %}
+                                                    <img src="{{ item.color.img.url }}" alt="Product image">
+                                                    {% else %}
+                                                    <img src="{{ item.product.img_1.url }}" alt="Product image">
+                                                    {% endif %}
+                                                        
+                                                </a>
+                                            </figure>
+                                            <h3 class="product-title">
+                                                <a href="{{ item.product.get_absolute_url }}">{{ item.product.title }}<br> <span>
+                                                {% if item.color.name %}
+                                                color: {{item.color.name}}  
+                                                {% endif %}
+                                                    <br>                      
+                                                  {% if item.size.size %}
+                                                  size: {{item.size.size}}
+                                                  {% endif %}
+                                                     </span></a>
+                                            </h3>
+                                        </div>
+                                        <input type="hidden" name="id" id="cart-item-id" value="{{item.product.id}}">
+                                    </td>
+                                    <td class="price-col"><span>&#8358;{{ item.get_price_tag|floatformat:2|intcomma }}</span></td>
+                                    <td class="quantity-col" data-cart-id="{{ item.id }}">
+                                        <div class="cart-product-quantity">
+                                            <div class="color-quantity-inputs">
+                                                 <input type="number" class="quantity-input" data-cart-item-id="{{ item.id }}" value="{{ item.quantity }}" min="{{minimum_order}}">
+                                            </div>               
+                                        </div> 
+                                    </td>
+                                    <td class="cart-total" id="cart-total">&#8358;{{ item.get_total_price|floatformat:2|intcomma }} </td>
+                                    <td class="remove-col">
+                               
+                                    <button class="delete-button" data-cart-item-id="{{ item.id }}"><i class="icon-close"></i></button>
+                              
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>-->
+                            <tbody>
+                                {% for item in cart_items %}
+                                <tr data-cart-item-id="{{ item.id }}">
+                                    <td class="product-col">
+                                        <div class="product">
+                                            <figure class="product-media">
+                                                <a href="{{ item.product.get_absolute_url }}">
+                                                    {% if item.color.img.url %}
+                                                    <img src="{{ item.color.img.url }}" alt="Product image">
+                                                    {% else %}
+                                                    <img src="{{ item.product.img_1.url }}" alt="Product image">
+                                                    {% endif %}
+                                                </a>
+                                            </figure>
+                                            <h3 class="product-title">
+                                                <a href="{{ item.product.get_absolute_url }}">{{ item.product.title }}<br> <span>
+                                                {% if item.color.name %}
+                                                color: {{item.color.name}} <br>
+                                                
+                                                {% endif %}
+                                                {% if item.size.size %}
+                                                size: {{item.size.size}}
+                                                <p style="color: chocolate;">{{item.color.quantity}} in stock</p> 
+                                                  {% endif %}
+                                                    </span></a>
+                                            </h3>
+                                        </div>
+                                        <input type="hidden" name="id" id="cart-item-id" value="{{item.product.id}}">
+                                    </td>
+                                    <td class="price-col">
+                                        {% if item.size.price %}
+                                        <span class="new-price">&#8358; {{item.size.discount_price|floatformat:2|intcomma}}</span><br>
+                                        <span id="cart-item-total-" class="old-price" style="text-decoration: line-through;">&#8358; {{item.size.price|floatformat:2|intcomma}}</span><br>
+                                        {% else %}
+                                        {{ item.get_price_tag|floatformat:2|intcomma }}
+                                        {% endif %}                 
+                                </td>
+                                    <td class="quantity-col" data-cart-id="{{ item.id }}">
+                                        <div class="cart-product-quantity">
+                                            <div class="color-quantity-inputs">
+                                                <input type="number" class="quantity-input" data-cart-item-id="{{ item.id }}" value="{{ item.quantity }}" min="{{minimum_order}}" max="{{item.color.quantity}}">
+                                                <input type="hidden" class="color-price-{{item.id}}" name="price" data-cart-item-price="{{ item.price }}" value="{{ item.price }}" max="{{item.quantity}}">
+                                            </div>               
+                                        </div> 
+                                    </td>
+                                    <td class="cart-total" id="cart-item-total-{{ item.id }}">&#8358;{{ item.get_total_price|floatformat:2|intcomma }}</td>
+                                    <td class="remove-col">
+                                        <button class="delete-button" data-cart-item-id="{{ item.id }}"><i class="icon-close"></i></button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>                      
+                        </table>
+                    </div>
+                    <aside class="col-lg-3">
+                        <div class="summary summary-cart">
+                            <h3 class="summary-title">Cart Order</h3>
+                            <table class="table table-summary">
+                                <!-- <form method="post">
+                                    {% csrf_token %}
+                                    {{ location_form.as_p }}
+                                    <button type="submit" class="btn-primary btn">Update Location</button>
+                                </form> -->
+                                <tbody>
+                                    <tr class="summary-subtotal">
+                                        <td>Subtotal:</td>
+                                        <td id="order-total-"> &#8358;{{order.get_total|floatformat:2|intcomma}}</td>
+                                    </tr>
+                                   
+                                    {% if coupon_form %}
+                                        <tr>
+                                            <td>
+                                                <form method="post" action="{% url 'store:apply-coupon' %}">
+                                                    {% csrf_token %}
+                                                    <div>
+                                                        <label>you have a promo, use</label>
+                                                        <span style="color: rgb(89, 168, 11);">{{ code.code }}</span>
+                                                        <input class="form-control" placeholder="apply coupon here" name="code">
+                                                        <button type="submit" class="btn">apply</button>
+                                                    </div>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                    <tr class="summary-subtotal">
+                                        <td>delivery:</td>
+                                        
+                                        {% if oder.get_delivery_cost %}
+                                        <td>{{order.get_delivery_cost}}</td>
+                                            {% else %}
+                                        <td>not yet available</td>
+                                        {% endif %}
+                                            
+                                    </tr>
+                                    <tr class="summary-total">
+                                        <td>Total:</td>
+                                        <td id="total-with-delivery">
+                                          
+                                          
+                                                &#8358;{{ order.get_total|floatformat:2|intcomma }}
+                                       
+                                    </tr>
+                                </tbody>
+                            </table>                 
+                            <a href="{% url 'store:check-out' %}" class="btn btn-outline-primary-2 btn-order btn-block">PROCEED TO CHECKOUT</a>
+                            <!-- {% if not order.get_delivery_cost == 0 %}
+                            {% else %} -->
+                            <!-- <a  class="btn btn-outline-primary-2 btn-order btn-block">please choose location</a> -->
+                            <!-- {% endif %} -->
+                        </div>
+                        
+                        <a href="{% url 'store:categories-list' %}" class="btn btn-outline-dark-2 btn-block mb-3"><span>CONTINUE SHOPPING</span><i class="icon-refresh"></i></a>
+                    </aside>
+                </div>
+            
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+
+<div class="container">
+
+    <h2 class="w-50">Your cart is empty. <small><a href="{% url 'store:categories-list' %}">continue shoping</a></small></h2>
+</div>
+ 
+    {% endif %}
+
+
+
+    <script>
+
+            $(document).ready(function() {
+                $('.quantity-input').change(function() {
+                    var cartItemId = $(this).data('cart-item-id');
+                    var quantity = $('.quantity-input[data-cart-item-id="' + cartItemId + '"]').val();
+                        // Use AJAX for authenticated users
+                        $.ajax({
+                            type: 'POST',
+                            url: '{% url "store:update_cart_quantity" %}',
+                            data: {
+                                'cart_item_id': cartItemId,
+                                'quantity': quantity,
+                                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                            },
+                            success: function(response) {
+                                if (response.messages && response.messages[0].tags == 'success') {
+                                    // Update cart item total price
+                                    $('#cart-item-total-' + cartItemId).text(`₦${response.cart_item_total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`);
+    
+                                    // Update order total
+                                    $('#order-total-').text(`₦${response.total_order.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`);
+    
+                                    // Update total with delivery
+                                    var formattedTotal = new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(response.total_order_and_delivery);
+                                    $('#total-with-delivery').text(formattedTotal);
+    
+                                    console.log(response);
+                                } else {
+                                    console.log('Error updating cart');
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('AJAX Error: ' + status + error);
+                                //location.reload()
+                            }
+                        });
+                  
+                });
+        $('.delete-button').on('click', function() {
+            var cartItemId = $(this).data('cart-item-id');
+        
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '{% url "store:delete-from-cart" %}',
+                        data: {
+                            'cart_item_id': cartItemId,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                $('tr[data-cart-item-id="' + cartItemId + '"]').remove();
+                                $('#cart-total').text(response.cart_total);
+                                //$('#total-with-delivery').text(response.total_with_delivery);
+                                Swal.fire(
+                                    'Deleted!',
+                                    'Your item has been deleted.',
+                                    'success'
+                                ).then(() => {
+                                    location.reload(); // Refresh the page
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Error deleting item'
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        });       
+    });   
+    
+
+
+</script>
+</main>
+
+{% endblock content %}
+
+
+class CartView(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            coupon_form = CouponForm()
+            location_form = AbujaLocationForm()
+
+            if request.user.is_authenticated:
+                cart_items = Cart.objects.filter(user=request.user, is_ordered=False)
+                order = Order.objects.filter(user=request.user, is_ordered=False).first()
+            else:
+                session_cart_id = request.session.get('cart_id')
+                if not session_cart_id:
+                    session_cart_id = str(uuid.uuid4())
+                    request.session['cart_id'] = session_cart_id
+                    print(f"New session cart_id created: {session_cart_id}")
+
+                cart_items = Cart.objects.filter(cart_id=session_cart_id, is_ordered=False)
+                order = Order.objects.filter(cart_id=session_cart_id, is_ordered=False).first()
+                
+                print(f"Session cart_id: {session_cart_id}")
+                print(f"Cart items: {cart_items}")
+                print(f"Order: {order}")
+
+            coupons = Coupon.objects.filter(active=True)
+            locations = AbujaLocation.objects.all()
+
+            context = {
+                'coupon_form': coupon_form,
+                'location_form': location_form,
+                'locations': locations,
+                'coupons': coupons,
+                'order': order,
+                'cart_items': cart_items,
+                'total_with_delivery': order.get_total_with_delivery() if order else 0,
+            }
+
+            return render(request, 'store/cart.html', context)
+
+        except ObjectDoesNotExist:
+            messages.error(request, 'You do not have an active order.')
+            return redirect('store:categories')
+    def post(self, request, *args, **kwargs):
+        try:
+            if request.user.is_authenticated:
+                order = Order.objects.filter(user=request.user, is_ordered=False).first()
+            else:
+                session_cart_id = request.session.get('cart_id')
+                if not session_cart_id:
+                    session_cart_id = str(uuid.uuid4())
+                    request.session['cart_id'] = session_cart_id
+                    request.session.modified = True
+
+                order = Order.objects.filter(cart_id=session_cart_id, is_ordered=False).first()
+
+            # Debugging information
+            print(f"Order before forms: {order}")
+
+            coupon_form = CouponForm(request.POST)
+            location_form = AbujaLocationForm(request.POST)
+
+            if coupon_form.is_valid():
+                coupon_code = coupon_form.cleaned_data['code']
+                try:
+                    coupon = Coupon.objects.get(code=coupon_code, active=True)
+                    order.coupon = coupon
+                    order.save()
+                    messages.success(request, 'Coupon applied successfully.')
+                except Coupon.DoesNotExist:
+                    messages.error(request, 'Invalid coupon code.')
+
+            if location_form.is_valid():
+                location_id = location_form.cleaned_data['location']
+                print(f"Location ID from form: {location_id}")
+                abuja_location = AbujaLocation.objects.get(id=location_id)
+                order.abuja_location = abuja_location
+                order.save()
+                messages.success(request, 'Delivery location updated successfully.')
+
+            # Debugging information
+            print(f"Order after forms: {order}")
+
+            if request.user.is_authenticated:
+                cart_items = Cart.objects.filter(user=request.user, is_ordered=False)
+            else:
+                cart_items = Cart.objects.filter(cart_id=session_cart_id, is_ordered=False)
+
+            coupons = Coupon.objects.filter(active=True)
+            locations = AbujaLocation.objects.all()
+
+            context = {
+                'coupon_form': coupon_form,
+                'location_form': location_form,
+                'locations': locations,
+                'coupons': coupons,
+                'order': order,
+                'cart_items': cart_items,
+                'total_with_delivery': order.get_total_with_delivery() if order else 0,
+            }
+
+            return render(request, 'store/cart.html', context)
+
+        except ObjectDoesNotExist:
+            messages.error(request, 'You do not have an active order.')
+            return redirect('store:cart')
+

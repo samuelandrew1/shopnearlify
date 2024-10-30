@@ -1,0 +1,214 @@
+{% extends 'store/base.html' %}
+{% block title %}
+<title>aajomos |{{user}} | check-out</title>
+{% endblock title %}
+{% load crispy_forms_tags %}
+{% load humanize %}
+{% block content %}    
+
+<main class="main">
+    <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+        <div class="container">
+            <h1 class="page-title">Checkout<span>Shop</span></h1>
+        </div><!-- End .container -->
+    </div><!-- End .page-header -->
+    
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'store:index' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'store:categories-list' %}">Shop</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'store:cart' %}">Cart</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+            </ol>
+        </div>
+    </nav>
+    
+    <div class="page-content">
+        <div class="checkout">
+            <div class="container">
+                <div class="checkout-discount">
+                    {% if coupon %}
+                        {% for code in coupon %}
+                            <p style="color: rgb(110, 194, 2);">Use {{ code.code }}</p>
+                        {% endfor %}
+                    {% endif %}
+                    <form method="post" action="{% url 'store:apply-coupon' %}?next={{ request.path }}">
+                        {% csrf_token %}
+                        {{ order.coupon_form.as_p }}
+                        <button class="btn btn-primary" type="submit">Apply coupon </button>
+                    </form>
+                </div><!-- End .checkout-discount -->
+                
+                <form action="{% url 'store:check-out' %}" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-lg-9">
+                            <h2 class="checkout-title">Billing Details</h2>
+                            
+                            <label>Country *</label>
+                            {{ form.country }}
+
+                            <label>Street address *</label>
+                            {{ form.street_address }}
+                            {{ form.apartment }}
+
+                            <div class="row">
+
+                                <div class="col-sm-6">
+                                    <label>State</label>
+                                    <select id="state-select" name="state" class="form-control">
+                                        {% for value, display in form.state.field.choices %}
+                                            <option value="">select state</option>
+                                            <option value="{{ value }}">{{ display }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <div class="col-sm-6">
+                                    <label>Town / City *</label>
+                                    <select id="id_town" name="town" class="form-control">
+                                        <option value="">Select City</option>
+                                    </select>
+                                </div>
+
+                             
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label>Postcode / ZIP *</label>
+                                    {{ form.zip_code }}
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label>Phone *</label>
+                                    {{ form.telephone }}
+                                </div>
+                            </div>
+
+                            <label>Order notes (optional)</label>
+                            {{ form.message }}
+                        </div>
+
+
+
+
+                        <aside class="col-lg-3">
+                            <div class="summary">
+                                <h3 class="summary-title">Your Order</h3>
+                                <table class="table table-summary">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>price</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {% for item in cart %}
+                                        <tr>
+                                            <td><a href="{{item.product.get_absolute_url}}">{{ item.product.title }} {{ item.quantity }} pcs *</a></td>
+                                            <td> &#8358;{{ item.get_price_tag|floatformat:2|intcomma }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                        
+                                        <tr class="summary-subtotal">
+                                            <td>Subtotal:</td>
+                                            <td> &#8358;{{ order.get_total|floatformat:2|intcomma }}</td>
+                                        </tr><!-- End .summary-subtotal -->
+                                        <tr>
+                                            <td class="summary-subtotal">Delivery:</td>
+                                            <td ><span id="delivery_cost" class="summary-subtotal"></span></td>
+                                        </tr>
+                                        
+                                        <tr class="summary-total">
+                                            <td>Total:</td>
+                                            <td id="total_with_delivery" class="summary-subtotal"></td>
+                                        </tr>
+                                    </tbody>
+                                </table><!-- End .table table-summary -->
+                                <button type="submit" class="btn btn-primary">
+                                    <span class="btn-text">Place Order</span>
+                                    <span class="btn-hover-text">Proceed to Checkout</span>
+                                </button>
+                            
+
+                            </div><!-- End .summary -->
+                        </aside><!-- End .col-lg-3 -->
+                    </div><!-- End .row -->
+                </form>
+            </div><!-- End .container -->
+        </div><!-- End .checkout -->
+    </div><!-- End .page-content -->
+</main><!-- End .main -->
+
+<button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+<script>
+    $(document).ready(function() {
+        $('#state-select').change(function() {
+            var state = $(this).val();
+            if (state) {
+                $.ajax({
+                    url: '{% url "store:load_cities" %}',  // URL for the AJAX view
+                    data: {
+                        'state': state
+                    },
+                    success: function(data) {
+                        var $citySelect = $('#id_town');
+                        $citySelect.empty();  // Clear existing options
+                        $citySelect.append(new Option("Select City", "")); // Add a default option
+
+                        // Populate new options
+                        $.each(data, function(index, city) {
+                            $citySelect.append(new Option(city.town_name, city.town_name));
+                        });
+                    },
+                    error: function() {
+                        alert('Error loading cities. Please try again.');
+                    }
+                });
+            } else {
+                $('#id_town').empty().append(new Option("Select City", ""));
+            }
+        });
+    });
+
+
+
+
+
+
+    $(document).ready(function() {
+        $('#state-select, #id_town').change(function() {
+            var state = $('#state-select').val();
+            var town = $('#id_town').val();
+    
+            if (state && town) {
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'delivery:update_delivery_cost' %}",
+                    data: {
+                        'state': state,
+                        'town': town,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                
+                            $('#total_with_delivery').text(`₦${parseFloat(response.total_with_delivery).toLocaleString('en-US', { minimumFractionDigits: 2 })}`);
+                            $('#delivery_cost').text(`₦${parseFloat(response.delivery_cost).toLocaleString('en-US', { minimumFractionDigits: 2 })}`);
+                        } else {
+                            alert(response.error);
+                        }
+                    }
+                });
+            }
+        });
+    });
+    
+    
+</script>
+
+{% endblock content %}

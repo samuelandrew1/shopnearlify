@@ -1,0 +1,49 @@
+<style>
+    .star-rating {
+        direction: rtl;
+        display: inline-flex;
+      }
+      
+      .star-rating input {
+        display: none;
+      }
+      
+      .star-rating label {
+        font-size: 2em;
+        color: #ddd;
+        cursor: pointer;
+      }
+      
+      .star-rating input:checked ~ label,
+      .star-rating label:hover,
+      .star-rating label:hover ~ label {
+        color: #f5b301;
+      }
+      
+</style>
+
+<div class="star-rating">
+    {% for i in "12345" %}
+      <input type="radio" name="{{ widget.name }}" value="{{ i }}" {% if widget.value == i %}checked{% endif %} id="id_{{ widget.name }}_{{ i }}">
+      <label for="id_{{ widget.name }}_{{ i }}">&#9733;</label>
+    {% endfor %}
+  </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const stars = document.querySelectorAll('.star-rating label');
+        stars.forEach(star => {
+          star.addEventListener('click', function () {
+            const allStars = star.parentElement.querySelectorAll('label');
+            allStars.forEach(s => s.style.color = '#ddd');
+            star.style.color = '#f5b301';
+            let prev = star.previousElementSibling;
+            while (prev) {
+              prev.style.color = '#f5b301';
+              prev = prev.previousElementSibling;
+            }
+          });
+        });
+      });
+      
+</script>

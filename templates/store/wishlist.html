@@ -1,0 +1,310 @@
+{% extends 'store/base.html' %}
+{% load humanize %}
+{% block title %}
+aajosmos | wishlist 
+{%endblock%}
+{% block content %}
+<main class="main">
+    <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+        <div class="container">
+            <a href="{% url 'store:categories-list' %}">
+                <h1 class="page-title">Wishlist<span>Shop</span></h1>
+            </a>
+        </div><!-- End .container -->
+    </div><!-- End .page-header -->
+    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'store:index' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'store:categories-list' %}">Shop</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Wishlist</li>
+            </ol>
+        </div><!-- End .container -->
+    </nav><!-- End .breadcrumb-nav -->
+
+    <div class="page-content">
+        <div class="container">
+            <table class="table table-wishlist table-mobile">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <!-- <th>Price</th> -->
+                         <th></th>
+                        <th>Stock Status</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% if wishlist %}
+                    {% for item in wishlist %}
+                    <tr>
+                        <td class="product-col">
+                            <div class="product">
+                                <figure class="product-media">
+                                    <a href="{{ item.product.get_absolute_url }}">
+                                        <img src="{{ item.product.img_1.url }}" alt="Product image">
+                                    </a>
+                                </figure>
+                                <h3 class="product-title">
+                                    <a href="{{ item.product.get_absolute_url }}">{{ item.product.title }}</a>
+                                </h3><!-- End .product-title -->
+                            </div><!-- End .product -->
+                        </td>
+                        <td class="price-col">
+                            <div class="product-price">
+                                
+                                {% for item in wishlist.size.all %}    
+                                {% if forloop.counter == 1 %}
+                                <span class="new-price">&#8358;{{ item.discount_price|floatformat:2|intcomma }}</span>
+                                <span class="old-price">&#8358;{{ item.price|floatformat:2|intcomma }}</span>
+                                {% else %}
+                                <span class="new-price">&#8358;{{ item.product.price|floatformat:2|intcomma }}</span>
+                                {% endif %}
+                                {% endfor %}
+                            </div><!-- End .product-price -->
+                        </td>
+                        {% if item.stock_quantity > 0 %}
+                        <td class="stock-col"><span class="in-stock">In stock: {{ item.stock_quantity }}</span></td>
+                        <td>
+                            <!-- <button class="btn-product btn-wishlist" 
+                            data-product-id="{{ item.id }}">
+                                Remove from Wishlist
+
+                    </button> -->
+                    <a href="{{item.product.get_remove_from_wishlist_url}}">
+                        <button class="btn-wishlistx">Remove from Wishlist</button>
+                    </a>
+                    
+
+                        </td>
+                        {% else %}
+                        <td><span class="out-of-stock">Out of stock</span></td>
+                        <td class="action-col">
+                            <button class="btn btn-block btn-outline-primary-2 disabled">Out of Stock</button>
+                        </td>
+                        {% endif %}
+                        <!-- <td class="remove-col"><a href="{{items.product.delete_cart}}"><button class="btn-remove" data-id="{{ item.id }}"><i class="icon-close"></i></button> </a></td> -->
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <p>Your wishlist is empty.</p>
+                    {% endif %}
+                </tbody>
+            </table><!-- End .table table-wishlist -->
+            <div class="wishlist-share">
+                <div class="social-icons social-icons-sm mb-2">
+                    <label class="social-label">Share on:</label>
+                    <a href="#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
+                    <a href="#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
+                    <a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
+                    <a href="#" class="social-icon" title="Youtube" target="_blank"><i class="icon-youtube"></i></a>
+                    <a href="#" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
+                </div><!-- End .social-icons -->
+            </div><!-- End .wishlist-share -->
+        </div><!-- End .container -->
+    </div><!-- End .page-content -->
+
+    <script>
+  
+        
+        $(document).ready(function () {
+            function deleteFromCart(event) {
+                event.preventDefault();
+                let productSlug = $(this).data('slug');
+                console.log('Delete from cart triggered', { 'slug': productSlug });
+                $.ajax({
+                    url: "{% url 'store:delete-from-cart' %}",
+                    method: 'POST',
+                    data: {
+                        slug: productSlug,
+                        csrfmiddlewaretoken: "{{ csrf_token }}"
+                    },
+                    success: function (response) {
+                        console.log('Success response:', response);
+                        $('#cart-count').html(response.cart_count);
+
+                        // Change button ID and text back to add to cart
+                        $('.delete-from-cart-btn[data-slug="' + productSlug + '"]').addClass('add-to-cart-btn').removeClass('delete-from-cart-btn').text('Add to Cart');
+                        // Attach add event
+                        $('.add-to-cart-btn[data-slug="' + productSlug + '"]').off('click').on('click', addToCart);
+                    },
+                    error: function (response) {
+                        console.log('Error response:', response);
+                    }
+                });
+            }
+
+            // Attach initial add to cart event
+            $('.add-to-cart-btn').off('click').on('click', addToCart);
+        });
+
+        $(document).ready(function() {
+            $('.btn-wishlist').click(function() {
+                var button = $(this);
+                var product_id = button.data('product-id');
+        
+                // SweetAlert confirmation
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to remove this item from your wishlist?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, remove it!',
+                    cancelButtonText: 'No, keep it'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        response.messages.forEach(function(message) {
+                            Swal.fire({
+                                text: message.message,
+                                icon: message.tags.includes('success') ? 'success' : 'error',
+                                timer: 3000,
+                                showConfirmButton: false
+                            });
+                        });
+            
+                    }
+                });
+            });
+        });
+        
+    </script>
+</main><!-- End .main -->
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+{% load custom_filters %}
+
+<!-- store/invoice_template.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice #{{ invoice.invoice_number }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+        .invoice-container {
+            width: 80%;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .invoice-header h1 {
+            margin: 0;
+            font-size: 28px;
+            color: #333333;
+        }
+        .invoice-header p {
+            margin: 5px 0;
+            color: #666666;
+        }
+        .invoice-details {
+            margin-bottom: 20px;
+        }
+        .invoice-details p {
+            margin: 4px 0;
+        }
+        .invoice-items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .invoice-items th {
+            background-color: #f2f2f2;
+            text-align: left;
+            padding: 10px;
+            font-weight: bold;
+        }
+        .invoice-items td {
+            border: 1px solid #dddddd;
+            padding: 10px;
+        }
+        .invoice-summary {
+            text-align: right;
+            margin-top: 20px;
+        }
+        .invoice-summary p {
+            margin: 4px 0;
+        }
+        .total-amount {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333333;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <h1>Invoice</h1>
+            <p><strong>Invoice Number:</strong> {{ invoice.invoice_number }}</p>
+            <p><strong>Payment Reference:</strong> {{ order.reference }}</p>
+            <p><strong>Order Number:</strong> {{ order.id }}</p>
+        </div>
+
+        <div class="invoice-details">
+            <p><strong>Customer:</strong> {{ order.user.username }}</p>
+            <p><strong>Shipping Address:</strong> {{ order.shipping_address }}</p>
+            <p><strong>Date:</strong> {{ order.created_at|date:"F j, Y" }}</p>
+        </div>
+
+        <table class="invoice-items">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Color</th>
+                    <th>Size</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.product.all %}
+                <tr>
+                    <td>{{ item.product.title }}</td>
+                    <td>{{ item.color.name }}</td> 
+                    <td>{{ item.size.size }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>
+                        {% if item.quantity >= item.size.wholesale_threshold %}
+                            {{ item.size.wholesale_price|floatformat:2 }}
+                        {% else %}
+                            {% if item.size.discount_price %}
+                                {{ item.size.discount_price|floatformat:2 }}
+                            {% else %}
+                                {{ item.size.price|floatformat:2 }}
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    <td>{{ item.get_total_price|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="invoice-summary">
+            <p class="total-amount">Total Price: {{ order.total_price|floatformat:2 }}</p>
+        </div>
+    </div>
+</body>
+</html>

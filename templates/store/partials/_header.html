@@ -1,0 +1,197 @@
+{% load static %}
+{% load cart_tags %}
+{% load custom_filters %}
+<header class="header header-6"> 
+    <div class="header-top">
+        <div class="container">
+            <div class="header-left">
+                <ul class="top-menu top-link-menu d-none d-md-block">
+                    <li>
+                        <a href="#">Links</a>
+                        <ul>
+                            <li><a href="tel:{{ site_settings.contact_number }}"><i class="icon-phone"></i>Call {{ site_settings.contact_number }}</a></li>
+                        </ul>
+                    </li>
+                </ul><!-- End .top-menu -->
+            </div><!-- End .header-left -->
+
+            <div class="header-right">
+                <div class="social-icons social-icons-color">
+                    <a href="{{site_settings.facebook_link }}" class="social-icon social-facebook" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
+                    <a href="{{site_settings.twiter_link }}" class="social-icon social-twitter" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
+                    <!-- <a href="#" class="social-icon social-pinterest" title="Instagram" target="_blank"><i class="icon-pinterest-p"></i></a> -->
+                    <a href="{{site_settings.instagram_link }}" class="social-icon social-instagram" title="Pinterest" target="_blank"><i class="icon-instagram"></i></a>
+                </div><!-- End .soial-icons -->
+                <ul class="top-menu top-link-menu">
+                    <li>
+                        <a href="#">Links</a>
+                        <ul>
+                            {% if request.user.is_authenticated %}
+                            <li><a href="{% url 'store:dash-board'%}"><i class="icon-user"></i> hello {{user}}</a></li>
+                            {% else %}             
+                            <li><a href="{% url 'account_login' %}" ><i class="icon-user"></i>Login</a></li>
+                            {% endif %}                          
+                        </ul>
+                    </li>
+                </ul>
+
+                <div class="header-dropdown">
+                    <a href="#">USD</a>
+                    <div class="header-menu">
+                        <ul>
+                            <li><a href="#">Eur</a></li>
+                            <li><a href="#">Usd</a></li>
+                            <li><a href="#">Naira</a></li>
+                        </ul>
+                    </div><!-- End .header-menu -->
+                </div><!-- End .header-dropdown -->
+
+                <div class="header-dropdown">
+                    <a href="#">Eng</a>
+                    <div class="header-menu">
+                        <ul>
+                            <li><a href="#">English</a></li>
+                            <li><a href="#">French</a></li>
+                            <li><a href="#">Spanish</a></li>
+                        </ul>
+                    </div><!-- End .header-menu -->
+                </div><!-- End .header-dropdown -->
+            </div><!-- End .header-right -->
+        </div>
+    </div>
+    <div class="header-middle">
+        <div class="container">
+            <div class="header-left">
+                <div class="header-search header-search-extended header-search-visible d-none d-lg-block">
+                    <a href="#" class="search-toggle" role="button"><i class="icon-search"></i></a>
+                    <form action="{% url 'store:search' %}" method="get">
+                        <div class="header-search-wrapper search-wrapper-wide">
+                            <label for="q" class="sr-only">Search</label>
+                            <button class="btn btn-primary" type="submit"><i class="icon-search"></i></button>
+                            <input type="search" class="form-control" name="q" id="q" placeholder="Search product ..." required>
+                        </div><!-- End .header-search-wrapper -->
+                    </form>
+                </div><!-- End .header-search -->
+            </div>
+            <div class="header-center">
+                <a href="{% url 'store:index'%}" class="logo">
+                    <img src="{{ site_settings.site_logo.url }}" alt="Logo" width="82" height="20">
+                </a>
+            </div><!-- End .header-left -->
+            <div class="header-right">
+                <a href="{% url 'store:wishlist' %}" class="wishlist-link">
+                    <i class="icon-heart-o"></i>
+                    <span class="wishlist-count" id="count">0</span>
+                    <span class="wishlist-txt">My Wishlist</span>
+                </a>
+
+                <div class="dropdown cart-dropdown">
+                    <a href="{% url 'store:cart'%}" class="dropdown-toggle" role="button" data-toggle="dropdow" aria-haspopup="true" aria-expanded="false" data-display="static">
+                    <i class="icon-shopping-cart"></i>
+                        <span class="cart-count" id="cart-count">0</span>
+                        <!-- <span class="cart-txt">$ 164,00</span> -->
+                    </a>           
+                </div><!-- End .cart-dropdown -->
+            </div>
+        </div><!-- End .container -->
+    </div><!-- End .header-middle -->
+
+    <div class="header-bottom sticky-header">
+        <div class="container">
+            <div class="header-left">
+                <nav class="main-nav">
+                    <ul class="menu sf-arrows">
+                        <li class="megamenu-container">
+                            <a href="{% url 'store:index'%}" class="sf-with-ul" target="_blank">Home</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'store:categories-list'%}" class="sf-with-ul">Shop</a>
+
+                            <div class="megamenu megamenu-md">
+                                <div class="row no-gutters">
+                                    <div class="col-md-8">
+                                        <div class="menu-col">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="menu-title">Shop</div>
+                                                    <ul>
+                                                        <li><a href="{% url 'store:view_orders' %}" target="_blank">Admin</a></li>
+                                                       <li><a href=""><span>Shop Market<span class="tip tip-new">New</span></span></a></li>
+                                                    </ul>
+
+                                                 
+                                                </div><!-- End .col-md-6 -->
+
+                                                <div class="col-md-6">
+                                                    <div class="menu-title">Product Category</div><!-- End .menu-title --> 
+                                                    <div class="menu-title">Pages</div><!-- End .menu-title -->
+                                                    <ul>
+                                                        <li><a href="{% url 'store:cart' %}">Cart</a></li>     
+                                                        <li><a href="{% url 'store:view_orders' %}">orders</a></li>     
+                                                        <li><a href="{% url 'store:wishlist' %}">Wishlist</a></li>
+                                                        <li><a href="{% url 'store:dash-board' %}">My Account</a></li>
+                                                        <li><a href="{% url 'admin:index' %}" target="blank">admin</a></li>
+                                                    
+                                                    </ul>
+                                                </div><!-- End .col-md-6 -->
+                                            </div><!-- End .row -->
+                                        </div><!-- End .menu-col -->
+                                    </div><!-- End .col-md-8 -->
+
+                                    <div class="col-md-4">
+                                        <div class="banner banner-overlay">
+                                            <a href="{% url 'store:categories-list' %}" class="banner banner-menu">
+                                                {% comment %} <img src="{% static 'assets/images/menu/banner-1.jpg' %}" alt="Banner"> {% endcomment %}
+
+                                                {% comment %} <div class="banner-content banner-content-top">
+                                                    <div class="banner-title text-white">Last <br>Chance<br><span><strong>Sale</strong></span></div><!-- End .banner-title -->
+                                                </div><!-- End .banner-content --> {% endcomment %}
+                                            </a>
+                                        </div><!-- End .banner banner-overlay -->
+                                    </div><!-- End .col-md-4 -->
+                                </div><!-- End .row -->
+                            </div><!-- End .megamenu megamenu-md -->
+                        </li>
+                  
+                        <li>
+                            <a href="#" class="sf-with-ul">Pages</a>
+
+                            <ul>
+                                <li>
+
+                                    <ul>
+                                        <li><a href="{% url 'admin:index' %}" target="_blank">admin</a></li>
+                                    </ul>
+                                </li>
+                            
+                                {% if not user.is_authenticated %}
+                                <li><a href="{% url 'account_login' %}">Login</a></li>
+                                {% else %}
+                                <li><a href="logout">Logout</a></li>
+                                {%endif%}
+                                <li><a href="faq">FAQs</a></li>
+                                <li><a href="404">Error 404</a></li>
+                                <li><a href="coming-soon">Coming Soon</a></li>
+                            </ul>
+                        </li>
+            
+                    </ul><!-- End .menu -->
+                </nav><!-- End .main-nav -->
+
+                <button class="mobile-menu-toggler">
+                    <span class="sr-only">Toggle mobile menu</span>
+                    <i class="icon-bars"></i>
+                </button>
+            </div><!-- End .header-left -->
+
+            <div class="header-right">
+                <i class="la la-lightbulb-o"></i><p>A.A JOMOS</span></p>
+            </div>
+        </div><!-- End .container -->
+    </div><!-- End .header-bottom -->
+
+
+
+
+    
+</header><!-- End .header -->

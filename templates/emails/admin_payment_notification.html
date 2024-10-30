@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Verified Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .content {
+            padding: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .details-table th, .details-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .details-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .footer {
+            padding: 20px;
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            Payment Verified Notification
+        </div>
+        <div class="content">
+            <p>Dear Admin,</p>
+            <p>A payment has been successfully verified. Here are the details:</p>
+
+            <table class="details-table">
+                <tr>
+                    <th>Invoice Number</th>
+                    <td>{{ invoice.invoice_number }}</td>
+                </tr>
+                <tr>
+                    <th>Order ID</th>
+                    <td>{{ order.id }}</td>
+                </tr>
+                <tr>
+                    <th>User</th>
+                    <td>{{ order.user.get_full_name }} ({{ order.user.email }})</td>
+                </tr>
+                <tr>
+                    <th>Payment Reference</th>
+                    <td>{{ payment.ref }}</td>
+                </tr>
+                <tr>
+                    <th>Amount Paid</th>
+                    <td>&#8358;{{ payment.amount }}</td> <!-- Naira symbol -->
+                </tr>
+                <tr>
+                    <th>Payment Status</th>
+                    <td>Verified</td>
+                </tr>
+                <tr>
+                    <th>Issued At</th>
+                    <td>{{ invoice.issued_at }}</td>
+                </tr>
+            </table>
+
+            <p>To view more details, click the button below:</p>
+            <a href="{% url 'store:dash-board' %}" class="button">View Order</a>
+
+            <p>Thank you for your attention.</p>
+            <p>Best regards,<br>Your Company</p>
+        </div>
+        <div class="footer">
+            &copy; {{ year }} Your Company. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>

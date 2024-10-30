@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+    {% load socialaccount %}
+    <head>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+            }
+   
+            .container h2 {
+                text-align: center;
+            }
+            .container form {
+                margin-top: 20px;
+            }
+            .container form label {
+                display: block;
+                margin-bottom: 5px;
+            }
+            .container form input[type="text"],
+            .container form input[type="email"],
+            .container form input[type="password"] {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+            .container form button {
+                width: 100%;
+                padding: 10px;
+                background-color: #4caf50;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+            .container form button:hover {
+                background-color: #45a049;
+            }
+            .container form .show-password {
+                margin-top: -10px;
+                display: flex;
+                align-items: center;
+            }
+            .container form .show-password input {
+                margin-right: 5px;
+            }
+        </style>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>account | login</title>
+        <link rel="icon" type="image/png" sizes="32x32" href="{% static 'atinuke/mzokashlogo.jpg' %}">
+        <link rel="manifest" href="{% static 'assets/images/icons/site.html' %}">
+        <link rel="mask-icon" href="{% static 'assets/images/icons/safari-pinned-tab.svg' %}" color="#666666">
+
+        <meta name="msapplication-config" content="{% static 'assets/images/icons/browserconfig.xml' %}">
+        <meta name="theme-color" content="#ffffff">
+        <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+        <style>
+            #error {
+                color: red;
+            }
+        </style>
+
+           
+    <!-- SEO Meta Tags -->
+    <title>Login to Your Account | Aajomos Nigeria Limited</title>
+    <meta name="description" content="Login to your Aajomos Nigeria Limited account to manage orders, track deliveries, and access personalized offers.">
+    <meta name="keywords" content="login, sign in, user account, Aajomos Nigeria Limited, aajomos.com, account login, Nigeria">
+    <meta name="author" content="Aajomos Nigeria Limited">
+    
+    <!-- Open Graph Meta Tags for Social Media -->
+    <meta property="og:title" content="Login to Your Account | Aajomos Nigeria Limited">
+    <meta property="og:description" content="Access your Aajomos Nigeria Limited account to manage your orders and track deliveries efficiently.">
+    <meta property="og:image" content="{{ site_settings.site_logo.url }}""> <!-- URL to a preview image -->
+    <meta property="og:url" content="https://aajomos.com/login">
+    <meta property="og:type" content="website">
+    <link rel="icon" type="image/jpg" href="{{ site_settings.site_logo.url }}">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Login | Aajomos Nigeria Limited">
+    <meta name="twitter:description" content="Sign in to your Aajomos Nigeria Limited account to manage orders and enjoy a personalized shopping experience.">
+    <meta name="twitter:image" content="https://aajomos.com/images/twitter-card-login.jpg">
+    
+    <!-- Robots Meta Tag -->
+    <meta name="robots" content="index, follow">
+
+    <!-- Canonical Tag to Avoid Duplicate Content -->
+    <link rel="canonical" href="https://aajomos.com/login">
+   
+    </head>
+
+    <body>
+        <div class="page-wrapper">
+            <main class="main">          
+                <div class="login-page bg-image pt-8 pb-8 pt-md-12 pb-md-12 pt-lg-17 pb-lg-17" style="background-image: url({% static 'atinukex/homepage.jpg' %})">
+                    <h6 class="text-center"><a href="{% url 'store:index' %}" style="color:blue;">back to site</a></h6>
+                    <div class="container">
+                        <div class="form-box">
+                            <div class="form-tab">
+                                <ul class="nav nav-pills nav-fill" role="tablist">
+                                    {% if user.is_superuser %}
+                                    <!-- <li class="nav-item">
+                                        <a class="nav-link" id="signin-tab-2" href="{% url 'admin:index' %}" role="tab" aria-controls="signin-2" target="_blank">Admin login</a>
+                                    </li> -->
+                                    {% endif %}
+                                    <li class="nav-item">
+                                        <a class="nav-link active" id="signin-tab-2" href="{% url 'store:login' %}" role="tab" aria-controls="signin-2">user login</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="register-tab-2" href="{% url 'store:signup' %}" role="tab" aria-controls="register-2">sign up</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-pane fade show active" id="register-2" role="tabpanel" aria-labelledby="register-tab-2">
+                                    <form method="post" action="{% url 'account_login' %}">
+                                        {{ form.as_p }}
+                                        <div class="show-password">
+                                          <input type="checkbox" id="show-password-checkbox">
+                                          <label for="show-password-checkbox">Show Password</label>
+                                      </div>
+
+                                        {% csrf_token %}
+                                        <div class="form-group">
+                                            {% if form.errors %}
+                                            <p id="error"> 
+                                                {{ form.errors.email }}
+                                                {{ form.errors.password1 }}
+                                                {{ form.errors.password2 }}
+                                            </p>
+                                            {% endif %}
+                                          </div>
+                                        {% if redirect_field_value %}
+                                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>           
+                                        {% endif %}
+                                        
+                                        <div class="form-footer">
+                                            <button type="submit" class="btn btn-outline-primary-2">
+                                                <span>LOGIN</span>
+                                                <i class="icon-long-arrow-right"></i>
+                                            </button>
+
+                                        
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="register-policy-2" required>
+                                                <label class="custom-control-label" for="register-policy-2">I agree to the <a href="#">privacy policy</a> *</label>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <div class="form-choice">
+                                        <p class="text-center">or sign in with</p>
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <a href="{% provider_login_url 'google' %}?next=store:index" class="btn btn-login btn-g">
+                                                    <i class="icon-google"></i>
+                                                    Login With Google
+                                                </a>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <a href="#" class="btn btn-login btn-f">
+                                                    <i class="icon-facebook-f"></i>
+                                                    Login With Facebook
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+        <div class="mobile-menu-overlay"></div>
+
+        <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+        <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'assets/js/jquery.hoverIntent.min.js' %}"></script>
+        <script src="{% static 'assets/js/jquery.waypoints.min.js' %}"></script>
+        <script src="{% static 'assets/js/superfish.min.js' %}"></script>
+        <script src="{% static 'assets/js/owl.carousel.min.js' %}"></script>
+        <script src="{% static 'assets/js/main.js' %}"></script>
+        
+      <!-- Show Password Toggle Script -->
+<script>
+  document.getElementById('show-password-checkbox').addEventListener('change', function() {
+      var passwordInputs = document.querySelectorAll('input[type="password"], input[type="text"]');
+      passwordInputs.forEach(function(input) {
+          if (input.type === 'password') {
+              input.type = 'text';
+          } else {
+              input.type = 'password';
+          }
+      });
+  });
+</script>
+
+    </body>
+</html>

@@ -1,0 +1,32 @@
+{% extends 'admin/base_site.html' %}
+{% block content %}
+    <h2>Order Report</h2>
+    <ul>
+        <li>Total Revenue: ₦{{ total_revenue|floatformat:2|intcomma }}</li>
+        <li>Total Orders: {{ total_orders }}</li>
+        <li>Pending Orders: {{ pending_orders }}</li>
+        <li>Delivered Orders: {{ delivered_orders }}</li>
+        <li>User Cancelled Orders: {{ user_cancelled_orders }}</li>
+    </ul>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>User</th>
+                <th>Total Price</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.user }}</td>
+                    <td>₦{{ order.get_total_with_delivery|floatformat:2|intcomma }}</td>
+                    <td>{{ order.get_status_display }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

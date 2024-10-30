@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% load i18n %}
+{% autoescape off %}
+{% blocktrans %}Hello from {{ current_site }}{% endblocktrans %}
+{% blocktrans %}You're receiving this email because user {{ user }} has given your email address to register an account on our site.{% endblocktrans %}
+
+{% blocktrans %}To activate this account, please click the following link:{% endblocktrans %}
+{{ activate_url }}
+
+{% blocktrans %}Thank you!{% endblocktrans %}
+{% endautoescape %}
+
+</body>
+</html>

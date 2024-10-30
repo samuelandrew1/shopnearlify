@@ -1,0 +1,24 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% trans "Confirm Your Email Address" %}{% endblock %}</title>
+</head>
+<body>
+    <h2>{% trans "Confirm Your Email Address" %}</h2>
+    <p>{% blocktrans %}Please check your email and follow the instructions to confirm your email address.{% endblocktrans %}</p>
+    <!-- templates/account/email_confirm.html -->
+
+{% block content %}
+  <h1>Email Confirmation</h1>
+  <p>Your email has been confirmed successfully. You are being redirected...</p>
+  <script>
+    setTimeout(function() {
+      window.location.href = "{% url 'store:index' %}";  // Replace 'home' with your desired URL name
+    }, 3000);  // Redirect after 3 seconds
+  </script>
+{% endblock %}
+
+</body>
+</html>

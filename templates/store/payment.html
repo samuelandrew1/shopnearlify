@@ -1,0 +1,72 @@
+{% load static %}
+{% load humanize %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>aajomos | {{ user }} | Order</title>
+    <link rel="stylesheet" href="{% static 'assets/css/order.css' %}">
+</head>
+<body>
+
+    <!-- Breadcrumb Section -->
+    <nav class="order-breadcrumb">
+        <div class="breadcrumb-container">
+            <ul class="breadcrumb-list">
+                <li><a href="{% url 'store:index' %}">Home</a></li>
+                <li><a href="{% url 'store:cart' %}">Cart</a></li>
+                <li><a href="{% url 'store:check-out' %}">Checkout</a></li>
+                <li>Order</li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Order Confirmation Section -->
+    <div class="order-container">
+        <div class="order-summary-box">
+            <h1>Confirm Your Order</h1>
+            <p>Reference: <strong>{{ order.reference }}</strong></p>
+
+            <!-- Order Table -->
+            <table class="order-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th class="text-right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Delivery</td>
+                        <td class="text-right">&#8358;{{ order.get_delivery_cost|floatformat:2|intcomma }}</td>
+                    </tr>
+                    <tr class="grand-total">
+                        <td>Grand Total</td>
+                        <td class="text-right">&#8358;{{ order.get_total_with_delivery|floatformat:2|intcomma }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Payment Form -->
+            <form id="paymentForm" method="POST" action="{% url 'paystack:initiate_payment' %}">
+                {% csrf_token %}
+                <input type="hidden" name="amount" value="{{ order.get_total_with_delivery }}">
+                <input type="hidden" value="{{ user.email }}" name="email">
+
+                <div class="button-group">
+                    <button type="submit" class="order-btn-primary">Confirm Payment</button>
+                </div>
+            </form>
+
+            <!-- Cancel Order Form -->
+            <form id="cancelOrderForm" method="POST" action="{% url 'store:cancel_order' order.id %}">
+                {% csrf_token %}
+                <button type="submit" class="order-btn-danger">Cancel Order</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

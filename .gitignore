@@ -20,5 +20,10 @@ rad.json
 *.flf
 #Test results file
 TestResults.xml
+<<<<<<< HEAD
 .venv
 .env
+=======
+.env
+.venv
+>>>>>>> draft/cranky-germain

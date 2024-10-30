@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Payment Successful</title>
+</head>
+<body>
+    <h1>Thank you for your purchase!</h1>
+    <p>Your payment has been successfully processed. Here are the details of your order:</p>
+    <p>Invoice Number: {{ invoice.invoice_number }}</p>
+    <p>Order Reference: {{ order.reference }}</p>
+    <p>Total Amount: ₦{{ payment.amount }}</p>
+    <!-- Add more order details as needed -->
+    <p>We will process and ship your order soon.</p>
+    <p>Thank you for shopping with us!</p>
+</body>
+</html>

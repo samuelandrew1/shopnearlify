@@ -1,0 +1,165 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3 {
+    margin: 0;
+    font-weight: bold;
+    color: #1a1a1a;
+}
+
+/* Breadcrumb Styling */
+.order-breadcrumb {
+    background-color: #fff;
+    padding: 15px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.breadcrumb-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.breadcrumb-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 10px;
+}
+
+.breadcrumb-list li {
+    display: inline;
+    font-size: 0.9rem;
+    color: #007bff;
+}
+
+.breadcrumb-list li:not(:last-child)::after {
+    content: ">";
+    margin-left: 8px;
+}
+
+.breadcrumb-list a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.breadcrumb-list a:hover {
+    text-decoration: underline;
+}
+
+/* Order Summary Styles */
+.order-container {
+    max-width: 800px;
+    margin: 40px auto;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.order-summary-box {
+    text-align: center;
+    padding: 20px;
+}
+
+.order-summary-box h1 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+.order-summary-box p {
+    font-size: 1rem;
+    color: #666;
+}
+
+/* Table Styling */
+.order-table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    background-color: #fafafa;
+}
+
+.order-table th, .order-table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+}
+
+.order-table th {
+    text-align: left;
+    background-color: #f1f1f1;
+    font-weight: 600;
+}
+
+.order-table td.text-right {
+    text-align: right;
+}
+
+.grand-total {
+    font-weight: bold;
+}
+
+.grand-total td {
+    background-color: #e9ecef;
+}
+
+/* Buttons */
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.order-btn-primary, .order-btn-danger {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.order-btn-primary {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+}
+
+.order-btn-primary:hover {
+    background-color: #218838;
+}
+
+.order-btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+}
+
+.order-btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* Responsive Design */
+@media only screen and (max-width: 600px) {
+    .order-container {
+        padding: 20px;
+    }
+
+    .order-table th, .order-table td {
+        font-size: 0.85rem;
+        padding: 10px;
+    }
+
+    .button-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
