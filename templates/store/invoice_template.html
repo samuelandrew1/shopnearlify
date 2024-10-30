@@ -1,0 +1,192 @@
+{% load humanize %}
+<!-- store/invoice_template.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <meta charset="UTF-8">
+    <title>A.A Jomos | Invoice #{{ invoice.invoice_number }}</title>
+    <style>
+        /* Styling for the icons */
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 5,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24;
+        }
+
+        /* Global styling for compact layout */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+
+        .invoice-container {
+            width: 100%; /* Full width */
+            max-width: 780px; /* Max width to fit a single page */
+            margin: 20px auto;
+            padding: 15px; /* Reduced padding */
+            background-color: #fff;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 4px; /* Reduced border radius */
+            page-break-inside: avoid;
+        }
+
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 20px; /* Reduced margin */
+        }
+
+        .invoice-header h1 {
+            font-size: 24px; /* Reduced font size */
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .invoice-header h2 {
+            font-size: 16px; /* Smaller font size */
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .invoice-header p {
+            margin: 0;
+            font-size: 12px; /* Reduced font size */
+            color: #555;
+        }
+
+        .invoice-details p {
+            font-size: 13px; /* Compact font size */
+            line-height: 1.4;
+            margin-bottom: 10px; /* Reduced margin */
+        }
+
+        .invoice-items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px; /* Reduced margin */
+            font-size: 13px; /* Reduced font size */
+            background-color: #fff;
+        }
+
+        .invoice-items th,
+        .invoice-items td {
+            border: 1px solid #ddd;
+            padding: 8px; /* Reduced padding */
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .invoice-items th {
+            background-color: #f3f3f3;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .invoice-items tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .invoice-summary {
+            margin-top: 10px; /* Reduced margin */
+            font-size: 14px;
+            text-align: right;
+        }
+
+        .invoice-summary p {
+            margin: 6px 0; /* Compact summary */
+        }
+
+        .total-amount {
+            font-size: 18px; /* Slightly larger for emphasis */
+            font-weight: bold;
+            color: #333;
+        }
+
+        .highlight {
+            color: #007bff;
+        }
+
+        /* Button/Link Styling */
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <h1>A.A Jomos Nigeria Limited</h1>
+            <h2>Order Invoice</h2>
+            <p><strong>Invoice Number:</strong> {{ invoice.invoice_number }}</p>
+            <p><strong>Payment Reference:</strong> {{ order.reference }}</p>
+            <p><strong>Order Number:</strong> {{ order.id }}</p>
+        </div>
+
+        <div class="invoice-details">
+            <p><strong>Dear {{ order.user.username }},</strong></p>
+            <p>Thank you for your purchase! Below are the details of your order:</p>
+            <p>
+                <strong>Delivery Address:</strong><br>
+                {{ order.shipping_address.street_address }}<br>
+                Landmark: {{ order.shipping_address.apartment }}<br>
+                {{ order.shipping_address.town }}, {{ order.shipping_address.state }} State<br>
+                {{ order.shipping_address.zip_code }}, {{ order.shipping_address.country }}<br>
+                <a href="tel:{{ order.shipping_address.telephone }}" style="font-size: 14px;">
+                    <span class="material-symbols-outlined">phone</span>
+                    {{ order.shipping_address.telephone }}
+                </a>
+            </p>
+            <p><strong>Date:</strong> {{ order.date|date:"F j, Y" }}</p>
+            
+            {% if order.shipping_address.message %}
+            <p><strong>Message:</strong> "{{ order.shipping_address.message }}"</p>
+            {% endif %}
+        </div>
+
+        <table class="invoice-items">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Color</th>
+                    <th>Size</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.product.all %}
+                <tr>
+                    <td>{{ item.product.title }}</td>
+                    <td>{{ item.color.name }}</td>
+                    <td>{{ item.size.size }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>
+                        {% if item.quantity >= item.size.wholesale_threshold %}
+                        &#8358;{{ item.size.wholesale_price|floatformat:2|intcomma }}
+                        {% else %}
+                            {% if item.size.discount_price %}
+                            &#8358;{{ item.size.discount_price|floatformat:2|intcomma:2 }}
+                            {% else %}
+                            &#8358;{{ item.size.price|floatformat:2|intcomma }}
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="invoice-summary">
+            <p><strong>Subtotal:</strong> &#8358;{{ order.get_total|floatformat:2|intcomma }}</p>
+            <p><strong>Delivery Fee:</strong> &#8358;{{ order.get_delivery_cost|floatformat:2|intcomma }}</p>
+            <p class="total-amount"><strong>Total Amount Paid:</strong> <span class="highlight">&#8358;{{ order.get_total_with_delivery|floatformat:2|intcomma }}</span></p>
+        </div>
+    </div>
+</body>
+</html>

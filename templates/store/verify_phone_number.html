@@ -1,0 +1,60 @@
+{% extends "store/base.html" %}
+{% load countries %}
+{% block title %}
+aajomos | Verify phone number
+{%endblock title %}
+{% block content %}
+<div class="container d-flexx justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="row">
+        <div class="col-md-5 offset-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="text-center mb-4">Verify Your Phone Number</h3>
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ form.country.label_tag }}
+                            {{ form.country }}  <!-- Displays country with flag -->
+                            {% if form.country.errors %}
+                                <div class="text-danger">
+                                    {{ form.country.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.phone_number.label_tag }}
+                            {{ form.phone_number }}  <!-- Displays phone input with placeholder -->
+                            {% if form.phone_number.errors %}
+                                <div class="text-danger">
+                                    {{ form.phone_number.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const countryField = document.querySelector('#id_country');
+        const phoneField = document.querySelector('#id_phone_number');
+
+        // Change event on country selection
+        countryField.addEventListener('change', function() {
+            const countryCode = countryField.options[countryField.selectedIndex].getAttribute('data-country-code');
+            if (countryCode && !phoneField.value.startsWith(countryCode)) {
+                phoneField.value = `${countryCode} ${phoneField.value}`;  // Prepend country code
+            }
+        });
+    });
+</script>

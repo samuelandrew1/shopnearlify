@@ -1,0 +1,9 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+    <h1>Send Newsletter to {{ subscribers|length }} subscribers</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" name="apply" class="button btn-primary">Send Newsletter</button>
+    </form>
+{% endblock %}

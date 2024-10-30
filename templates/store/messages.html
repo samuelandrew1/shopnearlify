@@ -1,0 +1,35 @@
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+ 
+<script>
+    {% if messages %}
+    {% for message in messages %}
+    Swal.fire({
+        title: "{{message.tags}}",
+        text: "{{message}}",
+        icon: "{{message.tags}}",
+        timer: 2000,
+        showClass: {
+            popup: `
+              animate__animated
+              animate__fadeInUp
+              animate__faster
+            `
+          },
+          hideClass: {
+            popup: `
+              animate__animated
+              animate__fadeOutDown
+              animate__faster
+            `
+          }
+      });
+    {% endfor %}
+{% endif %}
+</script>
+
+
+
+{% endblock content %}
+    

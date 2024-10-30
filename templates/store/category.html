@@ -1,0 +1,296 @@
+{% extends "store/base.html" %}
+{%load static %}
+{% block title %}
+
+<meta name="description" content="explore our product catalogue for your books and stationary">
+<meta name="keywords" content="our books and stationay catalogue">
+<meta name="author" content="Aajomos Nigeria Limited">
+<title>books and stationary catalogue</title>
+<!-- Open Graph Meta Tags for Social Media -->
+<meta property="og:title" content="Sign Up for an Account | Aajomos Nigeria Limited">
+<meta property="og:description" content="Join Aajomos Nigeria Limited by creating an account to access special offers, track your orders, and manage your profile seamlessly.">
+<meta property="og:image" content="https://aajomos.com/images/signup-banner.jpg"> <!-- URL to a preview image -->
+<meta property="og:url" content="https://aajomos.com/sign-up">
+<meta property="og:type" content="website">
+
+<!-- Twitter Card Meta Tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="our books and stationay catalogue">
+<meta name="twitter:description" content="explore our product catalogue for your books and stationary">
+<meta name="twitter:image" content="https://aajomos.com/images/twitter-card-signup.jpg">
+
+{% endblock %}
+{% block content %}
+{% load humanize %}
+{% load star_rating %}
+	 
+        <main class="main">
+        	<div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+        		<div class="container">
+        			<h1 class="page-title">Book <small> and stationary</small><span> explore</span></h1>
+        		</div><!-- End .container -->
+        	</div><!-- End .page-header -->
+            <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'store:index' %}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="">Shop</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">categories</li>
+                    </ol>
+                </div>
+            </nav>
+            <div class="page-content">
+                <div class="container">
+                	<div class="row">
+                		<div class="col-lg-9">
+                			<div class="toolbox">
+                				<!-- <div class="toolbox-left">
+                					<div class="toolbox-info">
+                						Showing <span>9 of 56</span> Products
+                					</div>
+                				</div> -->
+
+                				 <div class="toolbox-right">
+                					<!-- <div class="toolbox-sort">
+                						<label for="sortby">Sort by:</label>
+                						<div class="select-custom">
+											<select name="sortby" id="sortby" class="form-control">
+												<option value="popularity" selected="selected">Most Popular</option>
+												<option value="rating">Most Rated</option>
+												<option value="date">Date</option>
+											</select>
+										</div>
+                					</div> -->
+                					<!-- <div class="toolbox-layout">
+                						<a href="" class="btn-layout">
+                							<svg width="16" height="10">
+                								<rect x="0" y="0" width="4" height="4" />
+                								<rect x="6" y="0" width="10" height="4" />
+                								<rect x="0" y="6" width="4" height="4" />
+                								<rect x="6" y="6" width="10" height="4" />
+                							</svg>
+                						</a>
+
+                						<a href="category-2cols.html" class="btn-layout">
+                							<svg width="10" height="10">
+                								<rect x="0" y="0" width="4" height="4" />
+                								<rect x="6" y="0" width="4" height="4" />
+                								<rect x="0" y="6" width="4" height="4" />
+                								<rect x="6" y="6" width="4" height="4" />
+                							</svg>
+                						</a>
+
+                						<a href="category.html" class="btn-layout active">
+                							<svg width="16" height="10">
+                								<rect x="0" y="0" width="4" height="4" />
+                								<rect x="6" y="0" width="4" height="4" />
+                								<rect x="12" y="0" width="4" height="4" />
+                								<rect x="0" y="6" width="4" height="4" />
+                								<rect x="6" y="6" width="4" height="4" />
+                								<rect x="12" y="6" width="4" height="4" />
+                							</svg>
+                						</a>
+
+                						<a href="category-4cols.html" class="btn-layout">
+                							<svg width="22" height="10">
+                								<rect x="0" y="0" width="4" height="4" />
+                								<rect x="6" y="0" width="4" height="4" />
+                								<rect x="12" y="0" width="4" height="4" />
+                								<rect x="18" y="0" width="4" height="4" />
+                								<rect x="0" y="6" width="4" height="4" />
+                								<rect x="6" y="6" width="4" height="4" />
+                								<rect x="12" y="6" width="4" height="4" />
+                								<rect x="18" y="6" width="4" height="4" />
+                							</svg>
+                						</a>
+                					</div> -->
+                				</div> 
+                			</div><!-- End .toolbox -->
+
+                            <div class="products mb-3">
+                                <div class="row justify-content-center">
+                                    {% for item in products_with_ratings %} 
+									<input type="hidden" value="{{item.product.slug}}" id="">            
+                                    <div class="col-6 col-md-4 col-lg-4">
+                                        <div class="product product-7 text-center">
+                                            <figure class="product-media">
+                                                <span class="product-label {{item.product.label}}">{{item.product.get_human_readable_label}}</span>
+                                                <a href="{{item.product.get_absolute_url}}">
+                                                    <img src="{{item.product.img_1.url}}" alt="Product image" class="product-image" style="height: 300px; object-fit:cover">
+                                                </a>
+
+                                                <!-- <div class="product-action-vertical">
+                                                    <a href="" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
+                                                    <a href="#" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
+                                                    <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
+                                                </div> -->
+                                                <div class="product-action">
+														<a href="{{item.product.get_absolute_url}}" class="btn-product btn-cart1" type="submit" data-slug="" id="cart-btn-x{{ item.product.slug }}"><span>{{item.product.title}}</span></a>
+                                                    <!-- <button class="btn-product btn-cart1" type="submit" id="cart-btn1"><span>add to cart</span></button>			 -->
+                                                </div><!-- End .product-action -->
+                                            </figure><!-- End .product-media -->
+
+                                            <div class="product-body">
+												
+												<h3 class="product-title"><a href="{{product.get_absolute_url}}">{{item.product.title}}</a></h3>
+												{% if item.product.total_stock == 0 %}
+													<p href="{{product.get_absolute_url}}">out of stock</p>
+															{% else %}
+															<span href="{{product.get_absolute_url}}" class="old-price">{{ item.product.total_stock|floatformat:2|intcomma }} in stock</span>
+													{% endif %}
+                                                <div class="product-price">
+													{% for size in item.sizes %}													
+													{% if forloop.counter == 1 %}			
+                                                    <span class="new-price">&#8358;{{size.wholesale_price|floatformat:2|intcomma}} - </span>
+                                                    <span class="new-price">&#8358;{{size.price|floatformat:2|intcomma}}</span> 
+													{% endif %}					
+													
+													{% endfor %}
+													
+                                                </div><!-- End .product-price -->
+                                                <div class="ratings-container">
+                                                    <style>
+                                                        #star-ratings {
+                                                            font-size: 20px;
+                                                            color: gold;
+                                                        }
+                                                    </style>
+                                                    <div id="star-ratings">
+														
+														{% if item.product.average_rating %}
+															
+														
+                                                        {{ item.product.average_rating|floatformat:1 }}
+                                                        {% star_rating item.product.average_rating %}
+														{% else %}
+														<p>no reviews</p>
+														{% endif %}
+                                                    </div>
+                                                </div><!-- End .rating-container -->                                      
+                                            </div><!-- End .product-body -->
+                                        </div><!-- End .product -->
+                                    </div><!-- End .col-sm-6 col-lg-4 -->
+
+                                    {% endfor %}
+
+                             
+                                  
+                                </div><!-- End .row -->
+                            </div><!-- End .products -->
+							
+					
+								
+                			{% include 'store/partials/class_paginator.html' %}   
+							
+								
+                		</div><!-- End .col-lg-9 -->
+
+
+                		<aside class="col-lg-3 order-lg-first">
+                			<div class="sidebar sidebar-shop">
+                				<div class="widget widget-clean">
+                					<label>Filters:</label>
+                					<a href="{% url 'store:categories-list'%}" class="sidebar-filter-clear">Clean All</a>
+                				</div><!-- End .widget widget-clean -->
+								
+									
+								
+									
+                				<div class="widget widget-collapsible">
+    								<h3 class="widget-title">
+									    <a data-toggle="collapse" href="#widget-1" role="button" aria-expanded="true" aria-controls="widget-1">
+									        Category
+									    </a>
+									</h3><!-- End .widget-title -->
+
+									<div class="collapse show" id="widget-1">
+										<div class="widget-body">
+											<div class="filter-items filter-items-count">
+											{% for categories in category %}
+
+												<div class="filter-item">
+													
+													<div class="custom-control custom-checkbox">
+														<a href="{% url 'store:product_list_by_category' categories.slug %}">
+														<button type="submit" class="custom-control-inputx btn" id="category-btn">
+														<input type="hidden" value="{{categories.slug}}" id="category-input">
+														<label class="custom-control-label" for="cat-1" ><b>{{categories.title}}</b></label>
+														</a>
+													</div><!-- End .custom-checkbox -->
+													<span class="item-count">{{category_count}}</span>
+												
+												</div><!-- End .filter-item -->
+
+								{%endfor%}
+											
+											</div><!-- End .filter-items -->
+										</div><!-- End .widget-body -->
+									</div><!-- End .collapse -->
+        						</div><!-- End .widget -->
+        						<div class="widget widget-collapsible">
+    								<h3 class="widget-title">
+									    <a data-toggle="collapse" href="#widget-2" role="button" aria-expanded="true" aria-controls="widget-2">
+									        Price
+									    </a>
+									</h3><!-- End .widget-title -->
+
+									<div class="collapse show" id="widget-2">
+										<div class="widget-body">
+											<div class="filter-items">
+
+
+												<div class="filter-item">
+													<div class="custom-control custom-checkbox">
+														<form class="w-50" method="get" action="{% url 'store:search' %}">
+															{% csrf_token %}
+															<input type="number" name="min_price" value="{{ min_price }}" placeholder="Min Price" min="1">
+															<input type="number" name="max_price" value="{{ max_price }}" placeholder="Max Price" min="1">
+															
+															<button class="btn">filter price</button>
+														</form>
+													</div><!-- End .custom-checkbox -->
+												</div><!-- End .filter-item -->
+											</div><!-- End .filter-items -->
+										</div><!-- End .widget-body -->
+									</div><!-- End .collapse -->
+        						</div><!-- End .widget -->
+
+        			
+        						<!-- <div class="widget widget-collapsible">
+    								<h3 class="widget-title">
+									    <a data-toggle="collapse" href="#widget-5" role="button" aria-expanded="true" aria-controls="widget-5">
+									        Price
+									    </a>
+									</h3>
+
+									<div class="collapse show" id="widget-5">
+										<div class="widget-body">
+                                            <div class="filter-price">
+                                                <div class="filter-price-text">
+                                                    Price Range:
+                                                    <span id="filter-price-range"></span>
+                                                </div><!-- End .filter-price-text -->
+
+                                                <div id="price-slider"></div><!-- End #price-slider -->
+                                            </div><!-- End .filter-price -->
+										</div><!-- End .widget-body -->
+									</div><!-- End .collapse -->
+        						</div> 
+                			</div><!-- End .sidebar sidebar-shop -->
+                		</aside><!-- End .col-lg-3 -->
+
+                        
+                	</div><!-- End .row -->
+                </div><!-- End .container -->
+            </div><!-- End .page-content -->
+
+
+        </main><!-- End .main -->
+
+
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+
+ 
+{% endblock content %}
+ 

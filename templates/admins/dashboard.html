@@ -1,0 +1,13 @@
+{% comment %} {% extends "admin/base.html" %}
+
+{% block title %}My Custom Admin Dashboard{% endblock %}
+
+{% block content %}
+    <!-- Add a link to your custom dashboard here -->
+    <div class="dashboard-link">
+        <a href="{% url 'admin_dashboard' %}">Go to Custom Dashboard samuel</a>
+    </div>
+
+    <!-- Include the default admin dashboard content if needed -->
+    {{ block.super }}
+{% endblock %} {% endcomment %}

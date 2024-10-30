@@ -1,0 +1,81 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Products
+        <small>Optional description</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
+        <li class="active">Here</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content container-fluid">
+
+
+            <h2>Add New Product</h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Add Product</button>
+            </form>
+        
+            <br>
+            <h2>Product List</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Image</th>
+                        <th>Total Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.title }}</td>
+                        <td>{{ product.image_tag|safe }}</td>
+                        <td>{{ product.total_stock }}</td>
+                        <td>
+                            <a href="{% url 'admin:edit_product' product.pk %}">Edit</a> |
+                            <a href="{% url 'admin:delete_product' product.pk %}">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        
+            <!-- Pagination controls -->
+            {% if products.has_other_pages %}
+            <div class="pagination">
+                <span class="step-links">
+                    {% if products.has_previous %}
+                        <a href="?page=1">first</a>
+                        <a href="?page={{ products.previous_page_number }}">previous</a>
+                    {% endif %}
+        
+                    <span class="current">
+                        Page {{ products.number }} of {{ products.paginator.num_pages }}.
+                    </span>
+        
+                    {% if products.has_next %}
+                        <a href="?page={{ products.next_page_number }}">next</a>
+                        <a href="?page={{ products.paginator.num_pages }}">last</a>
+                    {% endif %}
+                </span>
+            </div>
+            {% endif %}
+        
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  {% endblock content %}

@@ -1,0 +1,86 @@
+{% extends 'admins/base.html' %}
+{% load humanize %}
+{% load custom_filters %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        <div class="alert {{ message.tags }}">
+          {{ message }}
+          <button type="button" class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="content-wrapper">
+    <!-- Notifications List -->
+    <div class="box box-primary">
+      <div class="box-header">
+        <i class="ion ion-clipboard"></i>
+        {% if notifications  %}
+
+        <h3 class="box-title">Notifications</h3>
+        {% endif %}
+
+      </div>
+      
+      <div class="box-body">
+        {% if notifications  %}
+        <ul class="todo-list" id="notifications">
+          {% for notification in notifications %}
+              <li id="notification-{{ notification.id }}">
+                  <span class="text">{{ notification.title }}</span>
+                  <small class="label label-info"><i class="fa fa-clock-o"></i> {{ notification.date }}</small>
+                  <div class="tools">
+                      <i class="fa fa-trash-o close-btn" onclick="deleteNotification({{ notification.id }})"></i>
+                  </div>
+              </li>
+          {% endfor %}
+          {% else %} 
+        <h3 class="box-title">No active Notifications</h3>
+          {% endif %}
+
+      </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+    function deleteNotification(notificationId) {
+      fetch("{% url 'store:delete_notification' %}", {
+          method: 'POST',
+          headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              action: 'delete_notification_action',
+              selected_ids: [notificationId]
+          })
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              // Remove notification from the DOM
+              document.getElementById(`notification-${notificationId}`).remove();
+              updateNotificationCount();
+          } else {
+              alert("Failed to delete notification.");
+          }
+      });
+  }
+  function updateNotificationCount() {
+    // Count remaining notifications
+    let count = document.querySelectorAll("#notifications li").length;
+    document.getElementById("notification-count").innerText = count;
+  }
+  </script>
+
+
+  {{black.super}}
+{% endblock content %}

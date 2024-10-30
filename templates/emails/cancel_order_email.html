@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Cancellation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333333;
+        }
+        .email-container {
+            width: 100%;
+            background-color: #f4f4f4;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .email-content {
+            max-width: 600px;
+            background-color: #ffffff;
+            margin: 0 auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .email-header {
+            background-color: #ee1919;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+        }
+        .email-body {
+            padding: 30px;
+        }
+        .email-body p {
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .email-body strong {
+            color: #007bff;
+        }
+        .email-footer {
+            padding: 20px;
+            background-color: #f4f4f4;
+            text-align: center;
+            font-size: 12px;
+            color: #666666;
+        }
+        .email-footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        @media only screen and (max-width: 600px) {
+            .email-header, .email-body, .email-footer {
+                padding: 15px;
+            }
+            .email-body p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-content">
+            <div class="email-header">
+                Order Cancelled
+            </div>
+            <div class="email-body">
+                <p>Dear <strong>{{ order.user.first_name }}</strong>,</p>
+                <p>We regret to inform you that your order with reference <strong>{{ order.reference }}</strong> has been cancelled. We apologize for any inconvenience this may cause.</p>
+                <p>If you have any questions or need assistance, feel free to <a href="mailto:support@yourcompany.com">contact our support team</a>. We're here to help you!</p>
+                <p>Thank you for your understanding.</p>
+                <p>Best regards,<br>Your Company Name</p>
+                <a href="https://www.yourcompany.com/contact" class="button">Contact Support</a>
+            </div>
+            <div class="email-footer">
+                <p>&copy; 2024 Your Company Name. All rights reserved.</p>
+                <p><a href="https://www.">Visit our website</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

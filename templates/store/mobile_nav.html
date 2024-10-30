@@ -1,0 +1,129 @@
+{% load custom_filters %}
+
+<div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->
+<div class="mobile-menu-container mobile-menu-light">
+    <div class="mobile-menu-wrapper">
+        <span class="mobile-menu-close"><i class="icon-close"></i></span>
+        
+
+    <form action="{% url 'store:search' %}" method="get" class="mobile-search">
+        <div class="header-search-wrapper search-wrapper-wide d-flex">
+            <label for="mobile-search" class="sr-only">Search</label>
+            <input type="search" class="form-control" name="q" id="q" placeholder="Search product ..." required>
+            <button class="btn btn-primary" type="submit"><i class="icon-search"></i></button>
+        </div>
+    </form> 
+        <ul class="nav nav-pills-mobile nav-border-anim" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="mobile-menu-link" data-toggle="tab" href="#mobile-menu-tab" role="tab" aria-controls="mobile-menu-tab" aria-selected="true">Menu</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="mobile-cats-link" data-toggle="tab" href="#mobile-cats-tab" role="tab" aria-controls="mobile-cats-tab" aria-selected="false">Categories</a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="mobile-menu-tab" role="tabpanel" aria-labelledby="mobile-menu-link">
+                <nav class="mobile-nav">
+                    <ul class="mobile-menu">
+                        <li class="active">
+                            <a href="{% url 'store:index' %}">Home</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'store:categories-list' %}">Shop</a>
+                       
+                        </li>
+                        <li>
+                            <a href="#">Pages</a>
+                            <ul>
+                                <li>
+                                    <a href="{% url 'store:refund-request'%}">Refunds</a>
+                                    {% if user.is_superuser %}        
+                                    <a href="{% url 'store:view_orders'%}">admin</a>
+                                    {%endif%}       
+                                    <a href="{% url 'store:contact'%}">contact</a>        
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="">Blog</a>                    
+                        </li>
+                        <li>
+                            <a href="">Elements</a>
+                        </li>
+                    </ul>
+                </nav><!-- End .mobile-nav -->
+            </div><!-- .End .tab-pane -->
+            <div class="tab-pane fade" id="mobile-cats-tab" role="tabpanel" aria-labelledby="mobile-cats-link">
+                <nav class="mobile-cats-nav">
+                    <ul class="mobile-cats-menu">
+                        
+                            {% get_categories as categories %}
+                                        {% for category in categories %}
+                                    <li>
+                                        
+                                            <a href="{% url 'store:product_list_by_category' category.slug %}" class="d-flex align-items-center" >
+                                             <img src="{{category.img.url}}" height="40px" width="35px" class="m-2">   
+                                            <span class="demo-title">{{category.title}}</span>
+                                            </a>
+                                     
+                                    </li>
+                                      {% endfor %}
+
+              
+                    </ul><!-- End .mobile-cats-menu -->
+                </nav><!-- End .mobile-cats-nav -->
+            </div><!-- .End .tab-pane -->
+        </div><!-- End .tab-content -->
+
+        <div class="social-icons">
+            <a href="#" class="social-icon" target="_blank" title="Facebook"><i class="icon-facebook-f"></i></a>
+            <a href="#" class="social-icon" target="_blank" title="Twitter"><i class="icon-twitter"></i></a>
+            <a href="#" class="social-icon" target="_blank" title="Instagram"><i class="icon-instagram"></i></a>
+            <a href="#" class="social-icon" target="_blank" title="Youtube"><i class="icon-youtube"></i></a>
+        </div><!-- End .social-icons -->
+        
+        {% if user.is_authenticated %}           
+    
+            <button class="icon btn m-2"> 
+                <p style="color: blue;" class="btn"> hello {{user}}</p>
+                <p style="color: blue;" id="logout-button">logout</p>
+                <i class="icon-user" style="size: 50px;"></i>
+            </button>
+      
+        {% else %}
+        <a href="{% url 'store:signup'%}">
+
+            <button class="icon btn m-2"> 
+         
+                <p style="color: blue;">login</p>
+                <i class="icon-user" style="size: 50px;"></i>
+            </button>
+        </a>
+        {% endif %}
+
+    </div><!-- End .mobile-menu-wrapper -->
+</div><!-- End .mobile-menu-container -->
+
+
+<form id="logout-form" method="post" action="{% url 'account_logout' %}" style="display:none;">
+    {% csrf_token %}
+</form>
+
+<script>
+document.getElementById('logout-button').addEventListener('click', function() {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, log me out!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('logout-form').submit();
+        }
+    })
+});
+</script>

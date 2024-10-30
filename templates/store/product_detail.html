@@ -1,0 +1,590 @@
+{% extends "store/base.html" %}
+{% block title %}
+<meta name="description" content="explore our product catalogue for your books and stationary">
+<meta name="keywords" content="our books and stationay catalogue">
+<meta name="author" content="Aajomos Nigeria Limited">
+<title>aa jomos | {{product.title}}</title>
+<!-- Open Graph Meta Tags for Social Media -->
+<meta property="og:title" content="{{product.title}}">
+<meta property="og:description" content="{{product.description}}">
+<meta property="og:image" content="{{product.img_1.url}}"> <!-- URL to a preview image -->
+<meta property="og:type" content="website">
+<!-- Twitter Card Meta Tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{product.title}}">
+<meta name="twitter:description" content="{{product.description}}">
+<meta name="twitter:image" content="{{product.img_1.url}}">
+
+{% endblock title %}
+{% load static %}
+{% block content %}
+{% load star_rating %}   
+{% load custom_filters %}
+{% load humanize %}
+{{block.super}}
+<main>
+    <style>
+        .quantity {
+            display: none;  /* Hide the quantity input field by default */
+        
+        } 
+        #page{
+            color: green;
+        }
+    </style>
+    <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0" >
+        <div class="container d-flex align-items-center">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'store:index' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'store:categories-list' %}">Shop</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ product.title }}</li>
+            </ol>
+            {% block seo %}
+            <meta name="description" content="{{ product.description.title }}">
+            <meta name="keywords" content="{{ product.title }}">
+            {% endblock seo %}
+        </div><!-- End .container -->
+    </nav><!-- End .breadcrumb-nav -->
+    <div class="page-content ">
+        <div class="container">
+            <div class="product-details-top">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="product-gallery product-gallery-separated">
+                            <span class="product-label label-sale">{{ product.get_human_readable_label }}</span>
+                        
+                            <!-- Image 1 -->
+                            {% if product.img_1 %}
+                            <figure class="product-separated-itemx">
+                                <img src="{{ product.img_1.url }}" alt="product image">
+                                <a href="#" id="btn-separated-gallery" class="btn-product-galleryn">
+                                    <i class="icon-arrows"></i>
+                                </a>
+                            </figure>
+                            {% endif %}
+                        
+                            <!-- Image 2 -->
+                            {% if product.img_2 %}
+                            <figure class="product-separated-itemx">
+                                <img src="{{ product.img_2.url }}" alt="{{ product.title }} image">
+                            </figure>
+                            {% endif %}
+                        
+                            <!-- Image 3 -->
+                            {% if product.img_3 %}
+                            <figure class="product-separated-itemx">
+                                <img src="{{ product.img_3.url }}" alt="{{ product.title }} image">
+                            </figure>
+                            {% endif %}
+                        
+                            <!-- Image 4 -->
+                            {% if product.img_4 %}
+                            <figure class="product-separated-itemx">
+                                <img src="{{ product.img_4.url }}" alt="{{ product.title }} image">
+                            </figure>
+                            {% endif %}
+                        </div><!-- End .product-gallery -->
+                        
+                    </div><!-- End .col-md-6 -->
+
+                    <div class="col-md-6">
+                        <div class="product-details sticky-content">
+                            <h1 class="product-title" id="product-title">{{ product.title }}</h1><!-- End .product-title -->
+
+                            <div class="ratings-container">
+                                <style>
+                                    #star-ratings {
+                                        font-size: 20px;
+                                        color: gold;
+                                    }
+                                </style>
+                                <div id="star-ratings">
+                                    {% star_rating product.average_rating %}
+                                    {{ product.average_rating|floatformat:1 }}
+                                </div>
+                                <span class="ratings-text">{{ item.count }}  {{ count }} reviews(s)</span>
+                            </div><!-- End .ratings-container -->                          
+                            {% for item in sizes %}              
+                            <div class="product-price">
+                                {% if forloop.counter == 1 %}
+                                <span class="new-price" id="new-price">&#8358;{{ item.wholesale_price|floatformat:2|intcomma }} - </span>
+                                <span class="new-price">&#8358;{{ item.price|floatformat:2|intcomma }}</span>
+                                {% endif %}
+                            </div><!-- End .product-price -->
+                            {% endfor %}
+
+                            <div class="product-content">
+                                <p id="product-description">{{ product.description }}</p>
+                            </div>
+
+                            <div class="product-details-action">           
+                              
+                                <div class="details-action-wrapper">
+                                    <button class="toggle-wishlist btn-product btn-wishlist btn" 
+                                    data-add-url="{{ product.get_add_to_wishlist_url }}" 
+                                    data-remove-url="{{ product.get_remove_from_wishlist_url }}" 
+                                    data-product-id="{{ product.id }}" 
+                                    class="btn">
+                                {% if in_wishlist %}
+                                    Remove from Wishlist
+                                {% else %}
+                                    Add to Wishlist
+                                {% endif %}
+                            </button>
+                            
+                                    <!-- <a href="#" class="btn-product btn-compare" title="Compare"><span>Add to Compare</span></a> -->
+                                </div><!-- End .details-action-wrapper -->
+                            </div><!-- End .product-details-action -->
+                 <div class="details-filter-row details-row-size">
+    <div class="product-cat">
+        <!-- Loop over sizes directly -->
+        <div class="details-filter-row details-row-size">
+            <div class="product-cat">
+            <!-- Loop over distinct size-color combinations for the product -->
+{% for size_color in size_colors.all %}
+<div class="size-section">
+    <div class="size-header">
+        <h6 style="color: #cc9966;"><small>Size: </small>{{ size_color.size.size }}</h6> <!-- Check if 'size' field exists -->
+        <div class="product-price">
+            <p class="new-price" id="new-price">&#8358;{{ size_color.size.discount_price|floatformat:2|intcomma }}</p>
+            <p class="old-price">&#8358;{{ size_color.size.price|floatformat:2|intcomma }}</p>
+        </div>
+    </div>
+    <!-- Loop over the colors associated with the specific size -->
+    <div class="color-section d-flex flex-wrap">
+        <div class="color-item d-flex align-items-center mb-3">
+            <div class="color-img">
+                <img src="{{ size_color.color.img.url }}" width="50px" height="55px">
+            </div>
+            <div class="color-details ml-3">
+                <div class="product-cat">
+                    <span>color: {{ size_color.color.name }}</span>
+                </div>
+                <div class="quantity-section d-flex align-items-center">
+                    <input type="number" min="1" max="{{ size_color.quantity }}" class="quantity text-center" data-size="{{ size_color.size.id }}" data-color="{{ size_color.color.id }}" value="0" style="width: 60px;">
+                    <button class="quantity-btn plus-btn btn btn-product" data-size="{{ size_color.size.id }}" data-color="{{ size_color.color.id }}" data-action="increase">Add to cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+            </div>
+        </div>    
+    </div>
+</div>
+
+                            <div class="product-details-footer">
+                                <div class="product-cat">
+                                    <span>Category:</span>
+                                    <a href="#">{{ product.category.title }}</a>
+                                </div><!-- End .product-cat -->
+                                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+                                <div class="social-icons social-icons-sm">
+                                    <span class="social-label">Share:</span>
+                                    <a href="{{product.get_facebook_share_url}}" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
+                                    <a href="{{product.get_twitter_share_url}}" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
+                                    <!-- <a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a> -->
+                                    <a href="{{product.get_whatsapp_share_url}}" target="_blank" style="font-size: 2em; color: #25D366;">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </a>
+                                </div><!-- End .social-icons -->
+                            </div><!-- End .product-details-footer -->
+                            
+                            <div class="accordion accordion-plus product-details-accordion" id="product-accordion">
+                                <div class="card card-box card-sm">
+                                    <div class="card-header" id="product-desc-heading">
+                                        <h2 class="card-title">
+                                            <a class="collapsed" role="button" data-toggle="collapse" href="#product-accordion-desc" aria-expanded="false" aria-controls="product-accordion-desc">
+                                                Description
+                                            </a>
+                                        </h2>
+                                    </div><!-- End .card-header -->
+                                    <div id="product-accordion-desc" class="collapse" aria-labelledby="product-desc-heading" data-parent="#product-accordion">
+                                        <div class="card-body">
+                                            <div class="product-desc-content">
+                                                <p>{{ product.description }}</p>
+                                            </div><!-- End .product-desc-content -->
+                                        </div><!-- End .card-body -->
+                                    </div><!-- End .collapse -->
+                                </div><!-- End .card -->
+                            
+                                <div class="card card-box card-sm">
+                                    <div class="card-header" id="product-info-heading">
+                                        <h2 class="card-title">
+                                            <a role="button" data-toggle="collapse" href="#product-accordion-info" aria-expanded="true" aria-controls="product-accordion-info">
+                                                Additional Information
+                                            </a>
+                                        </h2>
+                                    </div><!-- End .card-header -->
+                                    <div id="product-accordion-info" class="collapse show" aria-labelledby="product-info-heading" data-parent="#product-accordion">
+                                        <div class="card-body">
+                                            <div class="product-desc-content">
+                                                <p>{{ product.additional_information }}</p>
+                            
+                                            
+                                                <h3>Features</h3>
+                                                <ul>
+                                                    {% if product.feature1 %}
+                                                    <li>{{ product.feature1 }}</li>
+                                                    {% endif %}
+                                                    {% if product.feature2 %}
+                                                    <li>{{ product.feature2 }}</li>
+                                                    {% endif %}
+                                                    {% if product.feature3 %}
+                                                    <li>{{ product.feature3 }}</li>
+                                                    {% endif %}
+                                                    {% if product.feature4 %}
+                                                    <li>{{ product.feature4 }}</li>
+                                                    {% endif %}
+                                                    {% if product.feature5 %}
+                                                    <li>{{ product.feature5 }}</li>
+                                                    {% endif %}
+                                                    {% if product.feature5 %}
+                                                    <li>{{ product.feature5 }}</li>
+                                                    {% endif %} 
+                                                    {% if product.feature7 %}
+                                                    <li>{{ product.feature7 }}</li>
+                                                    {% endif %}
+
+                                             
+                                                    {% if product.feature8 %}
+                                                    <li>{{ product.feature8 }}</li>
+                                                    {% endif %}
+                                               
+                                                    {% if product.feature9 %}
+                                                    <li>{{ product.feature9 }}</li>
+                                                    {% endif %}
+                                              
+                                                    {% if product.feature10 %}
+                                                    <li>{{ product.feature10 }}</li>
+                                                    {% endif %}
+                                                    <br>
+                                                    <h>SPECIFICATION</h>
+                                                    
+                                                    {% if product.specification1 %}
+                                                        <li>{{product.specification1}}</li>
+                                                    {% endif %}
+                                                        {% if product.specification2 %}
+                                                        <li>{{product.specification2}}</li>
+                                                    {% endif %}
+                                                    {% if product.specification3 %}
+                                                        <li>{{product.specification3}}</li>
+                                                    {% endif %}
+                                                    {% if product.specification4 %}
+                                                        <li>{{product.specification4}}</li>
+                                                    {% endif %}
+                                                    {% if product.specification5 %}
+                                                        <li>{{product.specification5}}</li>
+                                                    {% endif %}
+                                                    {% if product.specification5 %}
+                                                        <li>{{product.specification6}}</li>
+                                                    {% endif %}
+                                                    {% if product.specification7 %}
+                                                        <li>{{product.specification7}}</li>
+                                                    {% endif %}
+                                                    {% if product.specification8 %}
+                                                        <li>{{product.specification8}}</li>
+                                                    {% endif %}
+                                                    {% if product.specification9 %}
+                                                        <li>{{product.specification9}}</li>
+                                                    {% endif %}
+                                                    {% if product.specification10 %}
+                                                        <li>{{product.specification10}}</li>
+                                                    {% endif %}
+                                                </ul>
+                                             
+                                            </div><!-- End .product-desc-content -->
+                                        </div><!-- End .card-body -->
+                                    </div><!-- End .card-body -->
+                                </div><!-- End .card -->
+                            
+                                {% for rating in ratings %}
+                                <div class="card card-box card-sm">
+                                    <div class="card-header" id="product-review-heading">
+                                        <h2 class="card-title">
+                                            <a class="collapsed" role="button" data-toggle="collapse" href="#product-accordion-review" aria-expanded="false" aria-controls="product-accordion-review">
+                                                 ({{ count }} Reviews)
+                                            </a>
+                                        </h2>
+                                    </div><!-- End .card-header -->
+                                    <div id="product-accordion-review" class="collapse" aria-labelledby="product-review-heading" data-parent="#product-accordion">
+                                        <div class="card-body">
+                                            <div class="reviews">
+                                                <div class="review">
+                                                    <div class="row no-gutters">
+                                                        <div class="col-auto">
+                                                            <h4><a href="#">{{ rating.user.username }}</a></h4>
+                                                            <div class="ratings-container">
+                                                                <div id="star-ratings" style="width: 100%;">
+                                                                    {% load star_rating %}
+                                                                    {% star_rating rating.rating %}
+                                                                </div><!-- End .ratings -->
+                                                            </div><!-- End .rating-container -->
+                                                            <span class="review-date">{{ rating.date }}</span>
+                                                        </div><!-- End .col -->
+                                                        <div class="col">
+                                                            <h4>{{ rating.headline }}</h4>
+                            
+                                                            <div class="review-content">
+                                                                <p>{{ rating.review }}</p>
+                                                            </div><!-- End .review-content -->
+                            
+                                                            <div class="review-action">
+                                                                <a href="#"><i class="icon-thumbs-up"></i>Helpful (0)</a>
+                                                                <a href="#"><i class="icon-thumbs-down"></i>Unhelpful (0)</a>
+                                                            </div><!-- End .review-action -->
+                                                        </div><!-- End .col-auto -->
+                                                    </div><!-- End .row -->
+                                                </div><!-- End .review -->
+                                                {% if user.is_authenticated and not user_rating %}
+                                                <form method="post">
+                                                    {% csrf_token %}
+                                                    {{ rating_form.as_p }}
+                                                    <!-- <button type="submit" class="btn btn-primary">Submit Rating</button> -->
+                                                </form>
+                                                {% endif %}
+                                            </div><!-- End .reviews -->
+                                        </div><!-- End .card-body -->
+                                    </div><!-- End .collapse -->
+                                </div><!-- End .card -->
+                                {% endfor %}
+                            </div><!-- End .accordion -->
+                            
+                        </div><!-- End .product-details -->
+                    </div><!-- End .col-md-6 -->
+                </div><!-- End .row -->
+            </div><!-- End .product-details-top -->
+           
+           {% if related_products %}         
+            <h2 class="title text-center mb-4">You May Also Like</h2><!-- End .title text-center -->
+            <div class="owl-carousel owl-simple carousel-equal-height carousel-with-shadow" data-toggle="owl" 
+                data-owl-options='{
+                    "nav": false, 
+                    "dots": true,
+                    "margin": 20,
+                    "loop": false,
+                    "responsive": {
+                        "0": {
+                            "items":1
+                        },
+                        "480": {
+                            "items":2
+                        },
+                        "768": {
+                            "items":3
+                        },
+                        "992": {
+                            "items":4
+                        },
+                        "1200": {
+                            "items":4,
+                            "nav": true,
+                            "dots": false
+                        }
+                    }
+                }'>
+                
+                {% for product in related_products %}                  
+                <div class="product product-7">
+                    <figure class="product-media">
+                        <span class="product-label label-new">New</span>
+                        <a href="{{product.get_absolute_url}}">
+                            <img src="{{product.img_1.url}}" alt="{{product.title}} image" class="product-image">
+                        </a>
+
+                        <div class="product-action-vertical">
+                            <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
+                            <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
+                            <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
+                        </div><!-- End .product-action-vertical -->
+
+                        <div class="product-action">
+                            <button href="#" class="btn-product btn-cart"><span>{{product.title}}</span></button>
+                        </div><!-- End .product-action -->
+                    </figure><!-- End .product-media -->
+
+                    <div class="product-body">
+                        <div class="product-cat">
+                            <a href="#">{{product.category.title}}</a>
+                        </div><!-- End .product-cat -->
+                        <h3 class="product-title"><a href="{{product.get_absolute_url}}">{{product.title}}</a></h3><!-- End .product-title -->
+                        <div class="product-price">		
+                            {% for size in product.size.all  %}		
+                            {% if forloop.counter == 1%}
+                            <span class="new-price">&#8358;{{size.discount_price|floatformat:2|intcomma}}</span>
+                            <span class="old-price">&#8358;{{size.price|floatformat:2|intcomma}}</span><br>
+                            <b class="m-2">{{size.size}}</b><br>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                       
+                        <div class="ratings-container">
+                            <style>
+                                #star-ratings {
+                                    font-size: 20px;
+                                    color: gold;
+                                }
+                            </style>
+                            <div id="star-ratings">
+                                <p id="average-rating">
+                                    {{ product.average_rating|floatformat:1 }}
+                                </p>
+                                {% star_rating product.average_rating %}
+                            </div>
+                            <span class="ratings-text">{{ product.count }}</span>
+                        </div><!-- End .ratings-container -->
+                        
+                        <div class="product-nav product-nav-dots">
+                            <a href="#" class="active" style="background: #cc9966;"><span class="sr-only">Color name</span></a>
+                            <a href="#" style="background: #7fc5ed;"><span class="sr-only">Color name</span></a>
+                            <a href="#" style="background: #e8c97a;"><span class="sr-only">Color name</span></a>
+                        </div><!-- End .product-nav -->
+                    </div><!-- End .product-body -->
+                </div><!-- End .product -->
+                {% endfor %}
+
+        
+          
+            </div><!-- End .owl-carosel -->
+           {% endif %}
+
+        </div><!-- End .container -->
+    </div><!-- End .page-content -->
+</main><!-- End .main -->
+
+<script>
+ 
+
+    $(document).ready(function() {
+        $('.toggle-wishlist').click(function() {
+            var button = $(this);
+            var add_url = button.data('add-url');
+            var remove_url = button.data('remove-url');
+            var in_wishlist = button.text().trim() === 'Remove from Wishlist';
+
+            var url = in_wishlist ? remove_url : add_url;
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(response) {
+                    if (response.in_wishlist) {
+                        $('.toggle-wishlist[data-product-id="' + button.data('product-id') + '"]').text('Remove from Wishlist');
+                    } else {
+                        $('.toggle-wishlist[data-product-id="' + button.data('product-id') + '"]').text('Add to Wishlist');
+                    }
+                }
+            });
+        });
+    });
+
+    $(document).ready(function() {
+        // Handle plus and minus button clicks
+        $('.quantity-btn').on('click', function() {
+            const action = $(this).data('action');
+            const quantityInput = $(this).siblings('.quantity');
+            let quantity = parseInt(quantityInput.val());
+            const maxQuantity = parseInt(quantityInput.attr('max'));
+            const size = $(this).data('size');
+            const color = $(this).data('color');
+            const slug = '{{ product.slug }}';
+            const csrfToken = '{{ csrf_token }}';
+    
+            // Show the input field when the button is clicked
+            quantityInput.css('display', 'block');
+    
+            // Increase or decrease the quantity
+            if (action === 'increase' && quantity < maxQuantity) {
+                quantity += 1;
+            } else if (action === 'decrease' && quantity > 1) {
+                quantity -= 1;
+            }
+    
+            // Prevent exceeding max quantity
+            if (quantity > maxQuantity) {
+                quantity = maxQuantity;
+            }
+    
+            // Update the input field value
+            quantityInput.val(quantity);
+    
+            // Trigger the AJAX request to update the cart
+            $.ajax({
+                type: 'POST',
+                url: '{% url "store:update_cart_size"  %}',
+                data: {
+                    'slug': slug,
+                    'size': size,
+                    'color': color,
+                    'quantity': quantity,
+                    'csrfmiddlewaretoken': csrfToken
+                },
+                success: function(response) {
+                    if (response.success) {
+                        console.log('Cart updated successfully', response);
+                        // Optionally, update cart totals, etc.
+                    } else {
+                        console.log('Failed to update cart', response);
+                        alert('Failed to update cart: ' + response.message);
+                    }
+                },
+                error: function(xhr) {
+                    console.log('An error occurred while updating the cart:', xhr.responseText);
+                    alert('An error occurred while updating the cart.');
+                }
+            });
+        });
+    
+        // Handle direct input field change
+        $('.quantity').on('change', function() {
+            let quantity = parseInt($(this).val());
+            const maxQuantity = parseInt($(this).attr('max'));
+            const size = $(this).data('size');
+            const color = $(this).data('color');
+            const slug = '{{ product.slug }}';
+            const csrfToken = '{{ csrf_token }}';
+    
+            // Prevent invalid quantity values
+            if (isNaN(quantity) || quantity <= 0) {
+                quantity = 1;
+                $(this).val(quantity);
+            }
+    
+            // Prevent exceeding max quantity
+            if (quantity > maxQuantity) {
+                quantity = maxQuantity;
+                $(this).val(quantity); // Update the input field with the max quantity
+            }
+    
+            // Trigger the AJAX request to update the cart
+            $.ajax({
+                type: 'POST',
+                url: '{% url "store:update_cart_size"  %}',
+                data: {
+                    'slug': slug,
+                    'size': size,
+                    'color': color,
+                    'quantity': quantity,
+                    'csrfmiddlewaretoken': csrfToken
+                },
+                success: function(response) {
+                    if (response.success) {
+                        console.log('Cart updated successfully', response);
+                    } else {
+                        console.log('Failed to update cart', response);
+                        alert('Failed to update cart: ' + response.message);
+                    }
+                },
+                error: function(xhr) {
+                    console.log('An error occurred while updating the cart:', xhr.responseText);
+                    alert('An error occurred while updating the cart.');
+                }
+            });
+        });
+    });
+    
+</script>
+   
+
+{% endblock %}

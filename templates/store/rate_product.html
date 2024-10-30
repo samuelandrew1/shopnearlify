@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>aajomos |Customer| Rating Form</title>
+    <style>
+        /* Custom star rating styles */
+        .star-rating {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .star-rating .star {
+            font-size: 2.5rem; /* Make stars bigger */
+            color: #ccc; /* Default color (gray) */
+            cursor: pointer;
+            transition: color 0.2s ease-in-out;
+        }
+
+        .star-rating .star:hover,
+        .star-rating .star.selected {
+            color: gold; /* Change color on hover or when selected */
+        }
+
+        .star-rating-select {
+            display: none; /* Hide the select box */
+        }
+
+        /* Style for the form */
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .submit-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Submit Your Rating</h2>
+            <div>
+                <img src="{{product.img_1.url}}" alt="">
+                <h4>{{product.title}}</h4>
+            </div>
+        <!-- Form starts here -->
+        <form method="POST" action="{% url 'store:submit_rating' product.slug %}">
+            {% csrf_token %}
+            <!-- Star Rating -->
+            <div class="star-rating">
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+            </div>
+
+            <!-- Hidden select input for star rating -->
+            <select id="star-rating" name="rating" class="star-rating-select">
+                <option value="1">★☆☆☆☆</option>
+                <option value="2">★★☆☆☆</option>
+                <option value="3">★★★☆☆</option>
+                <option value="4">★★★★☆</option>
+                <option value="5">★★★★★</option>
+            </select>
+
+            <!-- Headline Field -->
+            <input type="text" id="headline" name="headline" class="form-control" placeholder="Headline" required>
+
+            <!-- Review Field -->
+            <textarea id="review" name="review" class="form-control" placeholder="Write your review here..." rows="4" required></textarea>
+
+            <!-- Submit Button -->
+            <button class="submit-btn" type="submit">Submit Review</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const stars = document.querySelectorAll(".star-rating .star");
+            const ratingInput = document.getElementById("star-rating");
+
+            stars.forEach((star, index) => {
+                star.addEventListener("click", () => {
+                    // Set the selected class for clicked star and previous stars
+                    stars.forEach((s, i) => {
+                        if (i <= index) {
+                            s.classList.add("selected");
+                        } else {
+                            s.classList.remove("selected");
+                        }
+                    });
+                    // Update the hidden select input value
+                    ratingInput.value = index + 1;
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

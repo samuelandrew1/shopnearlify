@@ -1,0 +1,91 @@
+<script>
+  // Function to fetch CSRF token from cookies
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.startsWith(name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+          }
+      }
+  }
+  return cookieValue;
+}
+
+$(document).ready(function(){
+  function debounce(func, wait) {
+      let timeout;
+      return function(...args) {
+          const later = () => {
+              clearTimeout(timeout);
+              func.apply(this, args);
+          };
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+      };
+  }
+
+  const updateCart = debounce(function(){
+      let cartId = $('#product-id').val();
+      let quantity = $('#cart-quantity-input').val();
+      let size = $('#size').val();  // Adjust this selector based on your cart page UI
+      
+      console.log('Cart update triggered', {'id': cartId, 'qty': quantity, 'size': size});
+      
+      // Fetch CSRF token dynamically
+      const csrftoken = getCookie('csrftoken');
+
+      $.ajax({
+          url: "{% url 'store:update_cart_quantity' %}",
+          method: 'POST',
+          headers: { "X-CSRFToken": csrftoken },
+          data: {
+              id: cartId,
+              quantity: quantity,
+              size: size,  // Include size in the data sent to the backend
+              csrfmiddlewaretoken: csrftoken
+          },
+          success: function(response){
+              let formattedPrice = '₦' + response.total_price.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+              
+              // Update the product total price
+              $('#product-total-price').text(formattedPrice);
+
+              // Handle success, update other parts of the UI as needed
+              $('#cart-quantity-input').val(response.qty);  // Update cart quantity input
+              $('#size').val(response.size);  // Update size if provided in the response
+              $('#new-price').text(formattedPrice);  // Update new price display
+
+              console.log('Success response:', response);
+              alert('Cart updated successfully.');
+          },
+          error: function(response){
+              console.log('Error response:', response);
+              alert('Error updating cart. Please try again.');
+          }
+      });
+  }, 300);
+
+  $('#cart-quantity-input').off('change').on('change', updateCart);
+});
+
+// Function to fetch CSRF token from cookies
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.startsWith(name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+          }
+      }
+  }
+  return cookieValue;
+}
+
+</script>

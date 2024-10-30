@@ -1,0 +1,478 @@
+{% extends "store/base.html" %}
+{% load static %}
+{% block content %}
+{% load star_rating %}   
+{% load custom_filters %}
+{% load humanize %}
+
+<main>
+    <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
+        <div class="container d-flex align-items-center">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'store:index'">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'store:categories-list'%}">shop</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{product.title}}</li>
+            </ol>
+                
+            
+            {% block title %}
+                
+            {{ product.title }}
+            {% endblock title %}
+                
+                {% block seo %}
+                <meta name="description" content="{{ product.description.title }}">
+                <meta name="keywords" content="{{ product.title }}">
+                {% endblock seo %}
+<!--                     
+                {% if next_product %}
+           
+            <nav class="product-pager ml-auto" aria-label="Product">
+                <a class="product-pager-link product-pager-prev" href="#" aria-label="Previous" tabindex="-1">
+                    <i class="icon-angle-left"></i>
+                    <span>Prev</span>
+                </a>
+
+                <a class="product-pager-link product-pager-next" aria-label="Next" tabindex="-1">
+                    <span id="next-button">Next</span>
+                    <i class="icon-angle-right"></i>
+                </a>
+            </nav><!-- End .pager-nav -->
+            <!-- {% endif %}  -->
+
+        </div><!-- End .container -->
+    </nav><!-- End .breadcrumb-nav -->
+
+    <div class="page-content">
+        <div class="container">
+            <div class="product-details-top">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="product-gallery product-gallery-separated">
+                            <span class="product-label label-sale">{{product.label}}</span>
+                            <figure class="product-separated-itemx">
+                                <img src="{{product.img_1.url}}"  alt="product image">
+
+                                <a href="#" id="btn-separated-gallery" class="btn-product-gallery">
+                                    <i class="icon-arrows"></i>
+                                </a>
+                            </figure>
+                            
+                            {% if product.img_2 %}             
+                            <figure class="product-separated-item">
+                                <img src="{{product.img_2.url}}"  alt="product image">
+                            </figure>
+                            {% endif %}
+
+                            {% if product.img_3 %}             
+                            <figure class="product-separated-item">
+                                <img src="{{product.img_3.url}}"  alt="product image">
+                            </figure>
+                            {% endif %}
+
+                            {% if product.img_4 %}             
+                            <figure class="product-separated-item">
+                                <img src="{{product.img_4.url}}"  alt="product image">
+                            </figure>
+                            {% endif %}
+                        </div><!-- End .product-gallery -->
+                    </div><!-- End .col-md-6 -->
+
+                    <div class="col-md-6">
+                        <div class="product-details sticky-content">
+                            <h1 class="product-title"  id="product-title">{{product.title}}</h1><!-- End .product-title -->
+
+                            <div class="ratings-container">
+                                <style>
+                                    #star-ratings {
+                                        font-size: 20px;
+                                        color: gold;
+                                    }
+                                </style>
+                                <div id="star-ratings">
+                                   <p id="average-rating">
+
+                                       {{ product.average_rating|floatformat:1 }}
+                                   </p>
+                                    {% star_rating product.average_rating %}
+                                </div>
+                                <span class="ratings-text">{{item.count}} {{count}} (reviews)</span>
+                            
+                            </div>
+                            <div class="product-price">
+
+                                {% if product.discount_price|floatformat:2|intcomma%}
+                                    
+                                <span class="new-price" id="new-price">&#8358;{{product.discount_price|floatformat:2|intcomma}}</span>
+                                <span class="old-price">&#8358;{{product.price|floatformat:2|intcomma}}</span>
+                                {% else %}
+                                <span class="new-price">&#8358;{{product.price|floatformat:2|intcomma}}</span>
+                                <span class="old-price">&#8358;{{product.discount_price|floatformat:2|intcomma}}</span>
+                                {% endif %}
+                                    
+                            </div><!-- End .product-price -->
+
+                            <div class="product-content">
+                                <p id="product-description">{{product.description}}</p>
+                            </div><!-- End .product-content -->
+
+                            <div class="product-countdown" data-until="2019, 10, 29"></div><!-- End .product-countdown -->
+
+
+                            {% if is_in_cart %}
+
+                            <div class="product-details-action">
+                                <a class="btn-product btn-cart" type="submit" id="cart-btn" href="{{product.delete_cart}}?next={{ request.path }}"><span>delete from cart</span></a>
+                                
+                                <div class="details-action-wrapper">
+                                    <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
+                                    <a href="#" class="btn-product btn-compare" title="Compare"><span>Add to Compare</span></a>
+                                </div><!-- End .details-action-wrapper -->
+                            </div><!-- End .product-details-action -->
+                            
+                            
+
+                             <div class="details-filter-row details-row-size">
+                                <label for="size">Size:</label>
+                                <div class="select-custom">
+                                    <select  id="size" class="form-control" name="size">
+                                        <option value="4 liters"{% if cart_item.size == "4 liters" %}selected{% endif %}>4 litres</option>
+                                        <option value="10 liters"{% if cart_item.size == "10 liters" %}selected{% endif %}>10 litres</option>
+                                           
+                                     
+                                    </select>
+                                </div>
+
+                         
+
+                            <div class="details-filter-row details-row-size">
+                                <label for="qty">Qty:</label>                         
+                                <div class="product-details-quantity">
+                                    {% csrf_token %}
+                                    <input type="number" id="cart-quantity-input"  class="form-control" data-item-id="{{ product.id }}" value="{{product.quantity}}" name="quantity" min="1"  step="1" data-decimals="0" required>
+                                    <input type="hidden" id="product-id" value="{{product.id}}" name="id">
+                                    
+                                </div><!-- End .product-details-quantity -->
+                            </div><!-- End .details-filter-row -->
+
+
+                            {%else%}
+                            <div class="product-details-action">
+                                <a class="btn-product btn-cart" type="submit" id="cart-btn" href="{% url 'store:add-to-cart' product.slug %}?next={{ request.path }}"><span>add to cart</span></a>
+                                
+                                <div class="details-action-wrapper">
+                                    <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
+                                    <a href="#" class="btn-product btn-compare" title="Compare"><span>Add to Compare</span></a>
+                                </div><!-- End .details-action-wrapper -->
+                            </div><!-- End .product-details-action -->
+                            
+                            {% endif %}
+                            
+                            
+                         
+                        <!-- </form> -->
+
+                            <div class="product-details-footer">
+                                <div class="product-cat">
+                                    <span>Category:</span>
+                                    <a href="#">{{product.category.title}}</a>,
+                                    
+                                </div><!-- End .product-cat -->
+
+                                <div class="social-icons social-icons-sm">
+                                    <span class="social-label">Share:</span>
+                                    <a href="#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
+                                    <a href="#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
+                                    <a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
+                                    <a href="#" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
+                                </div>
+                            </div><!-- End .product-details-footer -->
+
+                            <div class="accordion accordion-plus product-details-accordion" id="product-accordion">
+                                <div class="card card-box card-sm">
+                                    <div class="card-header" id="product-desc-heading">
+                                        <h2 class="card-title">
+                                            <a class="collapsed" role="button" data-toggle="collapse" href="#product-accordion-desc" aria-expanded="false" aria-controls="product-accordion-desc">
+                                                Description
+                                            </a>
+                                        </h2>
+                                    </div><!-- End .card-header -->
+                                    <div id="product-accordion-desc" class="collapse" aria-labelledby="product-desc-heading" data-parent="#product-accordion">
+                                        <div class="card-body">
+                                            <div class="product-desc-content">
+                                                <p>{{product.description}}</p>
+                                                <!-- <ul>
+                                                    <li>Nunc nec porttitor turpis. In eu risus enim. In vitae mollis elit. </li>
+                                                    <li>Vivamus finibus vel mauris ut vehicula.</li>
+                                                    <li>Nullam a magna porttitor, dictum risus nec, faucibus sapien.</li>
+                                                </ul>
+
+                                                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna viverra non, semper suscipit, posuere a, pede.</p> -->
+                                            </div><!-- End .product-desc-content -->
+                                        </div><!-- End .card-body -->
+                                    </div><!-- End .collapse -->
+                                </div><!-- End .card -->
+
+                                <div class="card card-box card-sm">
+                                    <div class="card-header" id="product-info-heading">
+                                        <h2 class="card-title">
+                                            <a role="button" data-toggle="collapse" href="#product-accordion-info" aria-expanded="true" aria-controls="product-accordion-info">
+                                                Additional Information
+                                            </a>
+                                        </h2>
+                                    </div><!-- End .card-header -->
+                                    <div id="product-accordion-info" class="collapse show" aria-labelledby="product-info-heading" data-parent="#product-accordion">
+                                        <div class="card-body">
+                                            <div class="product-desc-content">
+                                                <p>{{product.additional_information}}</p>
+                                                
+                                                {% if product.features %}
+                                                    
+                                                    
+                                                <h3>Features</h3>
+                                                <ul>
+                                                    
+                                                    {% if product.features.feature1 %}
+                                                    <li>{{product.features.feature1}}</li>                    
+                                                    {% endif %}
+                                                    
+                                                    
+                                                    {% if product.features.feature2 %}
+                                                    <li>{{product.features.feature2}}</li>                    
+                                                    {% endif %}
+
+                                                    {% if product.features.feature3 %}
+                                                    <li>{{product.features.feature3}}</li>                    
+                                                    {% endif %}
+
+                                                    {% if product.features.feature4 %}
+                                                    <li>{{product.features.feature4}}</li>                    
+                                                    {% endif %}
+
+                                                    {% if product.features.feature5 %}
+                                                    <li>{{product.features.feature5}}</li>                    
+                                                    {% endif %}
+                           
+                                                </ul>
+                                                {% endif %}
+
+                                                <h3>Size: {{product.size}}</h3>
+                                                
+                                            </div><!-- End .product-desc-content -->
+                                        </div><!-- End .card-body -->
+                                    </div><!-- End .collapse -->
+                                </div><!-- End .card -->
+
+                                <div class="card card-box card-sm">
+                                    <div class="card-header" id="product-shipping-heading">
+                                        <h2 class="card-title">
+                                            <a class="collapsed" role="button" data-toggle="collapse" href="#product-accordion-shipping" aria-expanded="false" aria-controls="product-accordion-shipping">
+                                                Shipping & Returns
+                                            </a>
+                                        </h2>
+                                    </div><!-- End .card-header -->
+                                    <div id="product-accordion-shipping" class="collapse" aria-labelledby="product-shipping-heading" data-parent="#product-accordion">
+                                        <div class="card-body">
+                                            <div class="product-desc-content">
+                                                <p>For full details of the delivery options we offer, please view our <a href="#">Delivery information</a><br>
+                                                We hope you’ll love every purchase, but if you ever need to return an item you can do so within a month of receipt. For full details of how to make a return, please view our <a href="#">Returns information</a></p>
+                                            </div><!-- End .product-desc-content -->
+                                        </div><!-- End .card-body -->
+                                    </div><!-- End .collapse -->
+                                </div><!-- End .card -->
+                               
+
+                                <div class="card card-box card-sm">
+                                    <div class="card-header" id="product-review-heading">
+                                        <h2 class="card-title">
+                                            <a class="collapsed" role="button" data-toggle="collapse" href="#product-accordion-review" aria-expanded="false" aria-controls="product-accordion-review">
+                                                Reviews ({{count}})
+                                            </a>
+                                        </h2>
+                                    </div><!-- End .card-header -->
+                                    <div id="product-accordion-review" class="collapse" aria-labelledby="product-review-heading" data-parent="#product-accordion">
+                                        <div class="card-body">
+                                            <div class="reviews">
+                     
+                                                {% for rating in ratings %}
+                                                <div class="review">
+                                                    <div class="row no-gutters">
+                                                        <div class="col-auto">
+                                                            <h4><a href="#">{{rating.user.username}}</a></h4>
+                                                            <div class="ratings-container">
+                                                                <div id="star">
+                                                                    <style>
+                                                                        #star{color: #e7ae10;
+                                                                        margin: 5;
+                                                                        height:  50px;
+
+
+                                                                        }
+                                                                    </style> 
+                                                                    {% star_rating rating.rating %}
+                                                                
+                                                                </div><!-- End .ratings -->
+                                                            </div><!-- End .rating-container -->
+                                                        </div><!-- End .col -->
+                                                        <div class="col">
+                                                            <!-- <h4>Very good</h4> -->
+                                                            
+                                                            <div class="review-content">
+                                                                <p>{{rating.review}}</p>
+                                                                <span class="review-date">{{rating.date|timesince:now}} ago</span>
+                                                            </div><!-- End .review-content -->
+
+                                                            <div class="review-action">
+                                                                <!-- <a href="#"><i class="icon-thumbs-up"></i>Helpful (0)</a>
+                                                                <a href="#"><i class="icon-thumbs-down"></i>Unhelpful (0)</a> -->
+                                                            </div><!-- End .review-action -->
+                                                        </div><!-- End .col-auto -->
+                                                    </div><!-- End .row -->
+                                                </div><!-- End .review -->
+
+                                             {%endfor%}
+
+                                            </div><!-- End .reviews -->
+                                        </div><!-- End .card-body -->
+                                    </div><!-- End .collapse -->
+                                </div><!-- End .card -->
+                                </div><!-- End .card -->
+                            </div><!-- End .accordion -->
+                        </div><!-- End .product-details -->
+                    </div><!-- End .col-md-6 -->
+                </div><!-- End .row -->
+            </div><!-- End .product-details-top -->
+
+            <hr class="mt-3 mb-5">
+
+            <h2 class="title text-center mb-4">You May Also Like</h2><!-- End .title text-center -->
+            <div class="owl-carousel owl-simple carousel-equal-height carousel-with-shadow" data-toggle="owl" 
+                data-owl-options='{
+                    "nav": false, 
+                    "dots": true,
+                    "margin": 20,
+                    "loop": false,
+                    "responsive": {
+                        "0": {
+                            "items":1
+                        },
+                        "480": {
+                            "items":2
+                        },
+                        "768": {
+                            "items":3
+                        },
+                        "992": {
+                            "items":4
+                        },
+                        "1200": {
+                            "items":4,
+                            "nav": true,
+                            "dots": false
+                        }
+                    }
+                }'>
+
+                {% for items in related_products %}
+                <div class="product product-7">
+                    <figure class="product-media">
+                        <span class="product-label label-new">{{items.label}}</span>
+                        <a href="{{items.get_absolute_url}}">
+                            <img src="{{items.img_1.url}}" alt="Product image" class="product-image">
+                        </a>
+
+                        <div class="product-action-vertical">
+                            <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
+                            <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
+                            <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
+                        </div><!-- End .product-action-vertical -->
+
+                        <div class="product-action">
+                            <a href="{% url 'store:add-to-cart' items.slug %}?next={{ request.path }}" class="btn-product btn-cart"><span>add to cart</span></a>
+                        </div><!-- End .product-action -->
+                    </figure><!-- End .product-media -->
+
+                    <div class="product-body ml-5">
+                        <div class="product-cat">
+                            <a href="#">{{items.category.title}}</a>
+                        </div><!-- End .product-cat -->
+                        <h3 class="product-title"><a href="product.html">{{item.description}} <br></a></h3><!-- End .product-title -->
+                        <div class="product-price">
+                            &#8358; {{items.price|floatformat:2|intcomma}}
+                        </div><!-- End .product-price -->
+                        <div class="ratings-container">
+                            <div id="star-ratings">
+                                <p id="average-rating">
+
+                                   {{ items.average_rating|floatformat:1 }}
+                                </p>
+                                 {% star_rating items.average_rating %}
+                             </div>
+                             <span class="ratings-text">{{items.count}} {{count}} (reviews)</span>
+                         
+                        </div><!-- End .rating-container -->
+
+                        <div class="product-nav product-nav-dots">
+                            <a href="#" class="active" style="background: #cc9966;"><span class="sr-only">Color name</span></a>
+                            <a href="#" style="background: #7fc5ed;"><span class="sr-only">Color name</span></a>
+                            <a href="#" style="background: #e8c97a;"><span class="sr-only">Color name</span></a>
+                        </div><!-- End .product-nav -->
+                    </div><!-- End .product-body -->
+                </div><!-- End .product -->
+
+                {%endfor%}
+            </div><!-- End .owl-carosel -->
+        </div><!-- End .container -->
+    </div><!-- End .page-content -->
+
+    <script>
+        
+        $(document).ready(function(){
+            function debounce(func, wait) {
+                let timeout;
+                return function(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func.apply(this, args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+        
+            const updateCart = debounce(function(){
+                let cartId = $('#product-id').val();
+                let quantity = $('#cart-quantity-input').val();
+                let size = $('#size').val();
+        
+                console.log('Cart update triggered', {'id': cartId, 'qty': quantity, 'size': size});
+                
+                $.ajax({
+                    url: "{% url 'store:update_cart_quantity' %}",  // Update this to your actual URL
+                    method: 'POST',
+                    data: {
+                        id: cartId,
+                        quantity: quantity,
+                        size: size,
+                        csrfmiddlewaretoken: "{{ csrf_token }}"
+                    },
+                    success: function(response){
+                        // Handle success, maybe update the cart UI
+
+                        
+                        console.log('Success response:', response);
+                    },
+                    error: function(response){
+                        console.log('Error response:', response);
+                    }
+                });
+            }, 300);  // Adjust debounce time as necessary
+        
+            $('#cart-quantity-input').off('change').on('change', updateCart);
+        });
+    </script>
+    
+    
+</main><!-- End .main -->
+
+{% endblock %}

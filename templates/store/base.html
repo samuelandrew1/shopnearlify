@@ -1,0 +1,127 @@
+{%load static %}
+{% load currency_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% block title %}
+    <title> A.A Jomos Book and stationary Store </title>  
+    {% endblock title%}
+    <meta name="keywords" content="aajomos">
+    <meta name="description" content="book shop and stationary">
+    <meta name="description" content="buy lates books and educational tools for your school">
+
+    <meta name="author" content="aajomos">
+    {% block seo %}
+    <meta>
+    {% endblock seo %}    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- <link rel="apple-touch-icon" sizes="180x180" href="{% static 'assets/images/icons/apple-touch-icon.png' %}"> -->
+    <link rel="manifest" href="{% static 'assets/images/icons/site.html' %}">
+    <link rel="icon" type="image/jpg" href="{{ site_settings.site_logo.url }}">
+    <meta name="msapplication-TileColor" content="#cc9966">
+    <meta name="msapplication-config" content="{% static 'assets/images/icons/browserconfig.xml' %}">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="{% static 'assets/vendor/line-awesome/line-awesome/line-awesome/css/line-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'atinuke/style.css' %}">
+    <!-- Plugins CSS File -->
+    <meta name="aajomos" content="aajomos book store and stationary">
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/plugins/owl-carousel/owl.carousel.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/plugins/magnific-popup/magnific-popup.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/plugins/jquery.countdown.css'%}">
+    <link rel="stylesheet" href="{% static 'assets/css/demos/demo-16.css' %}"> 
+    <link rel="stylesheet" href="{% static 'assets/css/skins/skin-demo-3.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/demos/demo-3.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/skins/skin-demo-4.css' %}">
+  </head>
+
+<body>
+  <div>
+    <!-- Plugins JS File -->
+    {%include 'store/partials/_header.html'%}
+    {%include 'store/partials/_sign_in.html'%}
+    {% include 'store/mobile_nav.html' %}
+    
+    {% block content %}   
+    {% endblock content %}
+
+    {%include 'store/messages.html'%}
+    
+    {% block script %}
+      
+  </div>
+  <div id="messages"></div>
+
+  <!-- <script src="{% static 'assets/js/cart.js' %}"></script> -->
+  <script src="{% static 'atinuke/addtocart.js'%}"></script>
+  <script src="{% static 'ecommerce/js/add_to_cart.js'%}"></script>
+    <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.hoverIntent.min.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.waypoints.min.js' %}"></script>
+    <script src="{% static 'assets/js/superfish.min.js' %}"></script>
+    <script src="{% static 'assets/js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.magnific-popup.min.js' %}"></script>
+    <!-- Main JS File -->
+    <script src="{% static 'assets/js/main.js' %}"></script>
+    <script src="{% static 'assets/js/demos/demo-16.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.sticky-kit.min.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.elevateZoom.min.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.countdown.min.js'%}"></script>
+    <script src="{% static 'assets/js/bootstrap-input-spinner.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.sticky-kit.min.js' %}"></script>
+    <script src="{% static 'assets/js/server.js' %}"></script>
+    <script src="{% static 'assets/js/wNumb.js' %}"></script>
+    <script src="{% static 'js/jquery.js'}" type='text/javascript'></script>
+    <!-- <script src="{% static 'assets/js/demos/demo-2.js' %}"></script> -->
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'assets/js/demos/demo-3.js' %}"></script>
+
+    <script src="{% static 'assets/js/demos/demo-4.js' %}"></script>
+
+
+    {% endblock script %}
+    <script>
+      // Function to update wishlist count
+      function updateWishlistCount() {
+          $.ajax({
+              url: "{% url 'store:wishlist-count' %}",
+              method: 'GET',
+              success: function(response) {
+                  $('#count').text(response.count);
+                  console.log(response.count);
+              }
+          });
+      }
+      
+      // Update count on page load and every 5 seconds
+      $(document).ready(function() {
+          updateWishlistCount(); // Update once on page load
+          setInterval(updateWishlistCount, 5000); // Then update every 5 seconds
+      });
+      
+      function updateCartCount() {
+          $.ajax({
+              url: "{% url 'store:cart-count' %}",
+              method: 'GET',
+              success: function(response) {
+                  $('#cart-count').text(response.cart_count);
+              }
+          });
+      }
+  
+     // Update count on page load and every 5 seconds
+     $(document).ready(function() {
+      updateCartCount(); // Update once on page load
+      setInterval(updateCartCount, 5000); // Then update every 5 seconds
+  });
+  
+  </script>
+</body>
+</html>

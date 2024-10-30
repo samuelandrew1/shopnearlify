@@ -1,0 +1,423 @@
+{% extends 'store/base.html' %}
+{% block title%}
+<title> a.ajomos | {{user}} | profile</title>
+{%endblock title%}
+{% block content %}
+{% load humanize %}
+
+<div class="page-wrapper">
+    <main class="main">
+        <nav aria-label="breadcrumb" class="breadcrumb-nav mb-3">
+            <div class="container">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'store:index' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="#">Shop</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">My Account</li>
+                </ol>
+            </div>
+        </nav>
+        <!-- End .breadcrumb-nav -->
+
+        {% if user.is_authenticated %}
+        <div class="page-content">
+            <div class="dashboard">
+                <div class="container">
+                    <div class="row">
+                        <aside class="col-md-4 col-lg-3">
+                            <ul class="nav nav-dashboard flex-column mb-3 mb-md-0" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="tab-dashboard-link" data-toggle="tab" href="#tab-dashboard" role="tab" aria-controls="tab-dashboard" aria-selected="true">Dashboard</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="tab-orders-link" data-toggle="tab" href="#tab-orders" role="tab" aria-controls="tab-orders" aria-selected="false">Orders</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="tab-downloads-link" data-toggle="tab" href="#tab-downloads" role="tab" aria-controls="tab-downloads" aria-selected="false">Downloads</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="tab-address-link" data-toggle="tab" href="#tab-address" role="tab" aria-controls="tab-address" aria-selected="false">Addresses</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="tab-account-link" data-toggle="tab" href="#tab-account" role="tab" aria-controls="tab-account" aria-selected="false">Account Details</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="tab-password-link" data-toggle="tab" href="#tab-password" role="tab" aria-controls="tab-password" aria-selected="false">Change Password</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="logout-buttonn">Sign Out</a>
+                                </li>
+                            </ul>
+                        </aside>
+                        <!-- End .col-lg-3 -->
+                        <div class="col-md-8 col-lg-9">
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="tab-dashboard" role="tabpanel" aria-labelledby="tab-dashboard-link">
+                                    <p>Hello <span class="font-weight-normal text-dark">{{ user }}</span></p>
+                                    <p>From your account dashboard you can view your <a href="#tab-orders" class="tab-trigger-link link-underline">recent orders</a>, manage your <a href="#tab-address" class="tab-trigger-link">shipping and billing addresses</a>, and <a href="#tab-account" class="tab-trigger-link">edit your password and account details</a>.</p>
+                                </div>
+                                <!-- .End .tab-pane -->
+
+                                <div class="tab-pane fade" id="tab-orders" role="tabpanel" aria-labelledby="tab-orders-link">
+									
+									{% if orders %}										
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">S/No.</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for order in orders %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>
+                                                    <ul>
+                                                        {% for item in order.product.all %}
+                                                        <li class="d-flex p-5">
+                                                            <a href="{{ item.product.get_absolute_url}}">
+                                                              {{forloop.counter}}  <img src="{{ item.color.img.url }}" width="50" class="m-1">
+                                                            </a>
+                                                            <div>
+
+                                                                <span>{{ item.product.title }}</span><br>
+                                                                <b>price: &#8358; {{ item.size.discount_price }}</b><br>
+                                                                <span>Quantity: {{ item.quantity }}</span><br>
+                                                                <span>color:{{ item.color.name }}</span><br>
+                                                                <span>size:{{ item.size.size }}</span><br>
+                                                            </div>
+                                                            {% if not order.is_received %}
+                                                            <form method="post" action="{% url 'store:mark-order-received' order.id %}?next={{ request.path }}">
+                                                                {% csrf_token %}
+                                                                <button type="submit" class=" btn btn-primary">Mark as Received</button>
+                                                            </form>     
+                                                            {% else %}
+                                                            {% for item in order.product.all %}
+                                                            <div class="d-flex">
+                                                                
+                                                                {% if forloop.counter == 1 %}
+                                                                    
+                                                                <button class="btn-product btn"  style="color: rgb(24, 228, 24);">Delivered</button>
+                                                                
+                                                                <a href="{% url 'store:rate_product' item.product.slug %}">
+                                                                    <button class="btn-product btn"  style="color: rgb(235, 200, 7);">review product</button>
+                                                                </a>
+                                                                {% endif %}
+                                                            </div>
+                                                            {% endfor %}
+                                                            {% endif %}                          
+                                                        </li>
+                                                        {% endfor %}
+                                                        <li>
+                                                            <b>Date: {{ order.date }}</b><br>
+                                                            <b>Ref No: {{ order.reference }}</b><br>
+                                                            <b>Amount: &#8358; {{ order.get_total|floatformat:2|intcomma }}</b><br>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                               
+                                                                                          
+                                            </tr>
+                                    
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+									{%else%}
+									<p>you have no active order</p>
+									{% endif %}
+
+                                    <a href="{% url 'store:categories-list' %}" class="btn btn-outline-primary-2"><span>GO SHOP</span><i class="icon-long-arrow-right"></i></a>
+                                </div>
+                                <!-- .End .tab-pane -->
+
+                                <div class="tab-pane fade" id="tab-downloads" role="tabpanel" aria-labelledby="tab-downloads-link">
+                                    <p>No downloads available yet.</p>
+                                    <a href="{% url 'store:categories-list' %}" class="btn btn-outline-primary-2"><span>GO SHOP</span><i class="icon-long-arrow-right"></i></a>
+                                </div>
+                                <!-- .End .tab-pane -->
+
+                                <div class="tab-pane fade" id="tab-address" role="tabpanel" aria-labelledby="tab-address-link">
+                                    <p>The following addresses will be used on the checkout page by default.</p>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="card card-dashboard">
+                                                <div class="card-body">
+                                                    <h3 class="card-title">Delivery Address</h3>
+                                                
+                                                    <form action="{% url 'store:dash-board' %}" method="post">
+                                                        {% csrf_token %}
+                                                        <div class="row">
+                                                            <div class="col-lg-9">
+                                                                <h2 class="checkout-title">Billing Details</h2>
+                                                    
+                                                                <!-- Country Field -->
+                                                                <label>Country *</label>
+                                                                {{ address_form.country }}
+                                                                {% if address_form.country.errors %}
+                                                                    <div class="error">{{ address_form.country.errors }}</div>
+                                                                {% endif %}
+                                                    
+                                                                <!-- Street Address and Apartment Fields -->
+                                                                <label>Street address *</label>
+                                                                {{ address_form.street_address }}
+                                                                {% if address_form.street_address.errors %}
+                                                                    <div class="error">{{ address_form.street_address.errors }}</div>
+                                                                {% endif %}
+                                                    
+                                                                {{ address_form.apartment }}
+                                                                {% if address_form.apartment.errors %}
+                                                                    <div class="error">{{ address_form.apartment.errors }}</div>
+                                                                {% endif %}
+                                                    
+                                                                <div class="row">
+                                                                    <!-- State Field -->
+                                                                    <div class="col-sm-6">
+                                                                        <label>State *</label>
+                                                                        <select id="state-select" name="state" class="form-control">
+                                                                            <option value="">Select State</option>
+                                                                            {% for value, display in address_form.state.field.choices %}
+                                                                                <option value="{{ value }}" {% if address_form.state.value == value %}selected{% endif %}>{{ display }}</option>
+                                                                            {% endfor %}
+                                                                        </select>
+                                                                        {% if address_form.state.errors %}
+                                                                            <div class="error">{{ address_form.state.errors }}</div>
+                                                                        {% endif %}
+                                                                    </div>
+                                                    
+                                                                    <!-- Town Field -->
+                                                                    <div class="col-sm-6">
+                                                                        <label>town *</label>
+
+                                                                        <select id="id_town" name="town" class="form-control">
+                                                                            <option value="">Select City</option>
+                                                                            {% for town in address_form.fields.town.choices %}
+                                                                                <option value="{{ town.0 }}" {% if town.0 == address.town %}selected{% endif %}>
+                                                                                    {{ town.1 }}
+                                                                                </option>
+                                                                            {% endfor %}
+                                                                        </select>
+                                                                        
+                                                                    </div><!-- End .col-sm-6 -->
+                                                                </div><!-- End .row -->
+                                                    
+                                                                <div class="row">
+                                                                    <!-- ZIP Code Field -->
+                                                                    <div class="col-sm-6">
+                                                                        <label>Postcode / ZIP *</label>
+                                                                        {{ address_form.zip_code }}
+                                                                        {% if address_form.zip_code.errors %}
+                                                                            <div class="error">{{ address_form.zip_code.errors }}</div>
+                                                                        {% endif %}
+                                                                    </div>
+                                                    
+                                                                    <!-- Phone Field -->
+                                                                    <div class="col-sm-6">
+                                                                        <label>Phone *</label>
+                                                                        {{ address_form.telephone }}
+                                                                        {% if address_form.telephone.errors %}
+                                                                            <div class="text-danger">{{ address_form.telephone.errors }}</div>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div><!-- End .row -->
+                                                    
+                                                                <!-- Order Notes Field -->
+                                                                <label>Order notes (optional)</label>
+                                                                {{ address_form.message }}
+                                                                {% if address_form.message.errors %}
+                                                                    <div class="error">{{ address_form.message.errors }}</div>
+                                                                {% endif %}
+                                                    
+                                                                <!-- Submit Button -->
+                                                                <button type="submit" class="btn btn-primary" name="update_address">Update</button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- End .col-lg-6 -->                                 
+                                    </div>
+                                    <!-- End .row -->
+                                </div>
+                                <!-- .End .tab-pane -->
+
+                                <div class="tab-pane fade" id="tab-account" role="tabpanel" aria-labelledby="tab-account-link">
+                                    <form method="post" action="{% url 'store:dash-board' %}">
+                                        {% csrf_token %}
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <label>First Name *</label>
+                                                <input type="text" name="first_name" value="{{ user.first_name }}" class="form-control" required>
+                                                {% for error in form.first_name.errors %}
+                                                <p class="text-danger">{{ error }}</p>
+                                                {% endfor %}
+                                            </div>
+                                            <!-- End .col-sm-6 -->
+
+                                            <div class="col-sm-6">
+                                                <label>Last Name *</label>
+                                                <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}" required>
+                                                {% for error in form.last_name.errors %}
+                                                <p class="text-danger">{{ error }}</p>
+                                                {% endfor %}
+                                            </div>
+                                            <!-- End .col-sm-6 -->
+                                        </div>
+                                        <!-- End .row -->
+
+                                        <label>Display Name *</label>
+                                        <input type="text" name="username" class="form-control" value="{{ user.username }}" required>
+                                        <small class="form-text">This will be how your name will be displayed in the account section and in reviews</small>
+                                        {% for error in form.username.errors %}
+                                        <p class="text-danger">{{ error }}</p>
+                                        {% endfor %}
+
+                                        <label>Email address *</label>
+                                        <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+                                        {% for error in form.email.errors %}
+                                        <p class="text-danger">{{ error }}</p>
+                                        {% endfor %}
+
+                                        <button type="submit" class="btn btn-outline-primary-2" name="update_profile">
+                                            <span>SAVE CHANGES</span>
+                                            <i class="icon-long-arrow-right"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                                <!-- .End .tab-pane -->
+
+                                <div class="tab-pane fade" id="tab-password" role="tabpanel" aria-labelledby="tab-password-link">
+                                    <div class="card card-dashboard">
+                                        <div class="card-body">
+                                            <h3 class="card-title">Change Password</h3>
+                                            <form method="post" action="{% url 'store:dash-board' %}">
+                                                {% csrf_token %}
+                                                <div class="form-group">
+                                                    <label for="old_password">Old Password *</label>
+                                                    <input type="password" name="old_password" id="old_password" class="form-control" required>
+                                                    {% for error in password_form.old_password.errors %}
+                                                    <p class="text-danger">{{ error }}</p>
+                                                    {% endfor %}
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="new_password1">New Password *</label>
+                                                    <input type="password" name="new_password1" id="new_password1" class="form-control" required>
+                                                    {% for error in password_form.new_password1.errors %}
+                                                    <p class="text-danger">{{ error }}</p>
+                                                    {% endfor %}
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="new_password2">Confirm New Password *</label>
+                                                    <input type="password" name="new_password2" id="new_password2" class="form-control" required>
+                                                    {% for error in password_form.new_password2.errors %}
+                                                    <p class="text-danger">{{ error }}</p>
+                                                    {% endfor %}
+                                                </div>
+
+                                                <button type="submit" class="btn btn-outline-primary-2" name="change_password">
+                                                    <span>CHANGE PASSWORD</span>
+                                                    <i class="icon-long-arrow-right"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- .End .tab-pane -->
+                            </div>
+                        </div>
+                        <!-- End .col-lg-9 -->
+                    </div>
+                    <!-- End .row -->
+                </div>
+                <!-- End .container -->
+            </div>
+            <!-- End .dashboard -->
+        </div>
+        <!-- End .page-content -->
+        {% else %}
+        <p>You must <a href="{% url 'account_signup' %}">sign up</a> to view your profile.</p>
+        {% endif %}
+    </main>
+    <!-- End .main -->
+
+</div>
+<!-- End .page-wrapper -->
+
+<button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+
+<form id="logout-form" method="post" action="{% url 'account_logout' %}" style="display:none;">
+    {% csrf_token %}
+</form>
+
+<script>
+document.getElementById('logout-buttonn').addEventListener('click', function() {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, log me out!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('logout-form').submit();
+        }
+    })
+});
+
+$(document).ready(function() {
+    // Get the current town from the user data
+    var currentTown = "{{ address.town }}";  // Use Django template syntax to pass the current town
+
+    $('#state-select').change(function() {
+        var state = $(this).val();
+        if (state) {
+            $.ajax({
+                url: '{% url "store:load_cities" %}',
+                data: {
+                    'state': state
+                },
+                success: function(data) {
+                    var $citySelect = $('#id_town');
+                    $citySelect.empty();  // Clear existing options
+                    $citySelect.append(new Option("Select City", "")); // Add default option
+
+                    // Populate new options with the returned data
+                    $.each(data, function(index, city) {
+                        var option = new Option(city.town_name, city.town_name);
+                        // Check if this town is the user's current town and preselect it
+                        if (city.town_name === currentTown) {
+                            option.selected = true;
+                        }
+                        $citySelect.append(option);
+                    });
+                },
+                error: function() {
+                    alert('Error loading cities. Please try again.');
+                }
+            });
+        } else {
+            $('#id_town').empty().append(new Option("Select City", ""));  // Reset the town field if no state selected
+        }
+    });
+
+    // Trigger change event on page load to populate towns for the current state
+    $('#state-select').trigger('change');
+});
+
+
+
+
+
+
+
+
+</script>
+
+
+
+{% endblock content %}

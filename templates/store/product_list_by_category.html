@@ -1,0 +1,314 @@
+{% extends "store/base.html" %}
+{%load static %}
+{% block content %}
+{% load humanize %}
+{% load star_rating %}   
+
+        <main class="main">
+        	<div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+        		<div class="container">
+        			<h1 class="page-title"> <small>under
+                        {% block title %}
+                        {{category.title}}
+                        {% endblock title %}
+                    </small><span> {{product_count}} product(s) found</span></h1>
+        		</div><!-- End .container -->
+        	</div><!-- End .page-header -->
+            <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'store:index'%}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="">Shop</a></li>
+                        <li class="breadcrumb-item " aria-current="page"><a href="{% url 'store:categories-list'%}">categories</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{category.title}}</li>
+                    </ol>
+                </div><!-- End .container -->
+            </nav><!-- End .breadcrumb-nav -->
+            <div id="product-list">
+            </div>
+            
+            <div class="page-content">
+                <div class="container">
+                	<div class="row">
+                		<div class="col-lg-9">
+                		
+                            <div class="products mb-3">
+                                <div class="row justify-content-center">
+                                    {% for item in products_with_ratings %}                                     
+                                    <div class="col-6 col-md-4 col-lg-4">
+                                        <div class="product product-7 text-center">
+                                            <figure class="product-media">
+                                                <span class="product-label label-new">{{item.product.get_human_readable_label}}</span>
+                                                <a href="{{item.product.get_absolute_url}}">
+                                                    <img src="{{item.product.img_1.url}}" alt="Product image" class="product-image" style="height: 300px; object-fit:cover">
+                                                </a>
+
+                                                <div class="product-action">
+													<button class="btn-product btn-cart1" type="submit" data-slugx="{{ item.product.slug }}" id="cart-btn-{{ item.product.slug }}"><span>{{item.product.title}}</span></button>
+
+                                                    <!-- <a href="" class="btn-product btn-cart"><span>add to cart</span></a> -->
+                                                </div><!-- End .product-action -->
+                                            </figure><!-- End .product-media -->
+
+                                            <div class="product-body">
+                                                <div class="product-cat">
+                                                    <a href="#">{{item.product.title}}</a>
+                                                </div><!-- End .product-cat -->
+                                                <h3 class="product-title"><a href="{{product.get_absolute_url}}">{{item.product.title}}</a></h3><!-- End .product-title -->
+                                                <div class="product-price">
+													{% for size in item.product.size.all %}													
+													{% if forloop.counter == 1 %}			
+                                                    <span class="new-price">&#8358;{{size.wholesale_price|floatformat:2|intcomma}} - </span>
+                                                    <span class="new-price">&#8358;{{size.price|floatformat:2|intcomma}}</span> 
+													{% endif %}					
+													
+													{% endfor %}
+													
+                                                </div><!-- End .product-price -->
+                                                <div class="ratings-container">
+                                                    <style>
+                                                        #star-ratings {
+                                                            font-size: 20px;
+                                                            color: gold;
+                                                        }
+                                                    </style>
+                                                    <div id="star-ratings">
+                                                        {{ item.average_rating|floatformat:1 }}
+                                                        {% star_rating item.average_rating %}
+                                                    </div>
+                                                    <span class="ratings-text">( {{item.count}} reviews)</span>
+                                                </div><!-- End .rating-container -->                                      
+                                            </div><!-- End .product-body -->
+                                        </div><!-- End .product -->
+                                    </div><!-- End .col-sm-6 col-lg-4 -->
+
+                                    {% endfor %}   
+                                </div><!-- End .row -->
+                            </div><!-- End .products -->
+                            
+                            {% include 'store/paginator.html' %}
+                            
+                
+
+
+                            
+                		</div>
+
+                		<aside class="col-lg-3 order-lg-first">
+                    <form method="GET" action="{% url 'store:product_list_by_category' category.slug %}">
+
+                			<div class="sidebar sidebar-shop">
+                				<div class="widget widget-clean">
+                					<label>Filters:</label>
+                					<a href="{% url 'store:categories-list'%}" class="sidebar-filter-clear">Clean All</a>
+                				</div><!-- End .widget widget-clean -->
+
+        						<div class="widget widget-collapsible">
+    								<h3 class="widget-title">
+									    <a data-toggle="collapse" href="#widget-2" role="button" aria-expanded="true" aria-controls="widget-2">
+									        Size
+									    </a>
+									</h3><!-- End .widget-title -->
+
+									<div class="collapse show" id="widget-2">
+										<div class="widget-body">
+											<div class="filter-items">
+			
+												<div class="filter-item">
+                                                    <div class="w-50">
+
+                                                        <select id="size" name="size" class="form-control">
+                                                        
+                                                            <option value="">All</option>
+                                                         {% for size in sizes %}
+                                                                <option value="{{ size.id }}" {% if size_id == size.id|stringformat:"s" %}selected{% endif %}>{{ size.size }}</option>
+                                                         {% endfor %}
+                                                        </select>												
+                                                    </div>			
+												</div><!-- End .filter-item -->
+
+											</div><!-- End .filter-items -->
+										</div><!-- End .widget-body -->
+									</div><!-- End .collapse -->
+        						</div><!-- End .widget -->
+
+        			
+        						<div class="widget widget-collapsible">
+    								<h3 class="widget-title">
+									    <a data-toggle="collapse" href="#widget-5" role="button" aria-expanded="true" aria-controls="widget-5">
+									        Price
+									    </a>
+									</h3><!-- End .widget-title -->
+
+									<div class="collapse show" id="widget-5">
+										<div class="widget-body">
+                                            <div class="filter-price">
+                                                <div class="filter-price-text">
+                                                    <div class="w-50">
+
+                                                        <label for="max_price">Min Price:</label>
+                                                        <input type="number" id="min_price" name="min_price" value="{{ min_price|default:'' }}">
+                                                        <label for="max_price">Max Price:</label>
+                                                        <input type="number" id="max_price" name="max_price" value="{{ max_price|default:'' }}">
+                                                    </div>
+                                                </div><!-- End .filter-price-text -->
+
+                                                <div id="price-slider"></div><!-- End #price-slider -->
+                                            </div><!-- End .filter-price -->
+										</div><!-- End .widget-body -->
+									</div><!-- End .collapse -->
+                                    <button class="btn btn-secondary" type="submit">filter</button>
+        						</div><!-- End .widget -->
+                			</div><!-- End .sidebar sidebar-shop -->
+                        </form>
+                		</aside><!-- End .col-lg-3 -->
+                        
+                	</div><!-- End .row -->
+                </div><!-- End .container -->
+            </div><!-- End .page-content -->
+
+            <script>
+                $(document).ready(function(){
+                    function debounce(func, wait) {
+                        let timeout;
+                        return function(...args) {
+                            const later = () => {
+                                clearTimeout(timeout);
+                                func.apply(this, args);
+                            };
+                            clearTimeout(timeout);
+                            timeout = setTimeout(later, wait);
+                        };
+                    }
+                
+                    const updateCart = debounce(function(){
+                        let cartId = "{{product.id}}";
+                        let quantity = $('#cart-quantity-input').val();
+                        let size = $('#size').val();
+                
+                        console.log('Cart update triggered', {'id': cartId, 'qty': quantity, 'size': size});
+                        
+                        $.ajax({
+                            url: "{% url 'store:update_cart_quantity' %}",
+                            method: 'POST',
+                            data: {
+                                id: cartId,
+                                quantity: quantity,
+                                size: size,
+                                csrfmiddlewaretoken: "{{csrf_token}}"
+                                
+                            },
+                            success: function(response){
+                                // Handle success, update the cart UI
+                                console.log('Success response:', response);
+                                
+                                // Update the price and quantity in the UI
+                                $('#new-price').text(`₦${response.total_price.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`);
+                                $('#cart-quantity-input').val(response.qty);
+                            },
+                            error: function(response){
+                                console.log('Error response:', response);
+                            }
+                        });
+                    }, 300);  // Adjust debounce time as necessary
+                
+                    // Bind addToCart to all add to cart buttons
+                    $('.btn-cart1').off('click').on('click', function(e){
+                        e.preventDefault();
+                        addToCart($(this).data('slug'));
+                    });
+                });
+                
+                function addToCart(productSlug) {
+                    console.log('Add to cart triggered', { 'slug': productSlug });
+                
+                    $.ajax({
+                        url: "",
+                        method: 'POST',
+                        data: {
+                            slug: productSlug,
+                            csrfmiddlewaretoken: "{{ csrf_token }}"
+                        },
+                        success: function(response) {
+                            // Handle success, update the cart UI
+                            console.log('Success response:', response);
+                            $('#cart-count').html(response.cart_count);
+                            
+                            // Change button ID and text
+                            $(`#cart-btn-${productSlug}`).attr('id', `delete-btn-${productSlug}`).text('Delete from Cart');
+                            
+                            // Display messages using SweetAlert
+                            if (Array.isArray(response.messages)) {
+                                response.messages.forEach(function(message) {
+                                    Swal.fire({
+                                        text: message.message,
+                                        icon: message.tags.includes('success') ? 'success' : 'error',
+                                        timer: 3000,
+                                        showConfirmButton: false
+                                    });
+                                });
+                            }
+                
+                            // Attach delete event
+                            $(`#delete-btn-${productSlug}`).off('click').on('click', function(e){
+                                e.preventDefault();
+                                deleteFromCart(productSlug);
+                            });
+                        },
+                        error: function(response) {
+                            console.log('Error response:', response);
+                        }
+                    });
+                }
+                
+                function deleteFromCart(productSlug) {
+                    console.log('Delete from cart triggered', { 'slug': productSlug });
+                
+                    $.ajax({
+                        url: "{% url 'store:delete-from-cart' %}",
+                        method: 'POST',
+                        data: {
+                            slug: productSlug,
+                            csrfmiddlewaretoken: "{{ csrf_token }}"
+                        },
+                        success: function(response) {
+                            // Handle success, update the cart UI
+                            console.log('Success response:', response);
+                            $('#cart-count').html(response.cart_count);
+                            
+                            // Change button ID and text back to add to cart
+                            $(`#delete-btn-${productSlug}`).attr('id', `cart-btn-${productSlug}`).text('Add to Cart');
+                
+                            // Display messages using SweetAlert
+                            if (Array.isArray(response.messages)) {
+                                response.messages.forEach(function(message) {
+                                    Swal.fire({
+                                        text: message.message,
+                                        icon: message.tags.includes('success') ? 'success' : 'error',
+                                        timer: 3000,
+                                        showConfirmButton: false
+                                    });
+                                });
+                            }
+                            // Attach add event
+                            $(`#cart-btn-${productSlug}`).off('click').on('click', function(e){
+                                e.preventDefault();
+                                addToCart(productSlug);
+                            });
+                        },
+                        error: function(response) {
+                            console.log('Error response:', response);
+                        }
+                    });
+                }
+                
+            </script>
+            
+        </main><!-- End .main -->
+
+
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+ 
+{% endblock content %}
+ 
